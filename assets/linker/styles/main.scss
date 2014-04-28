@@ -1,0 +1,30 @@
+body {
+	font-family: "AkkuratStd";
+	background: #fefefe;
+	margin:0;
+}
+
+
+
+//---------------------------------------------------------------------------------------
+//	Display view
+//---------------------------------------------------------------------------------------
+
+#movement-temp {
+  position: absolute;
+  background: none;
+  width: 100px;
+  height:100px;
+  border-radius:100%;
+  border:5px solid black;
+  -webkit-animation: breathing 2s infinite alternate;
+}
+
+//---------------------------------------------------------------------------------------
+//	Keyframes
+//---------------------------------------------------------------------------------------
+
+@-webkit-keyframes breathing {
+	0% 		{-webkit-transform: translateX(100px)}
+	100% 	{-webkit-transform: translateX(-100px)}
+}

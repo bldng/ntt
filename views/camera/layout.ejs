@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%- title %></title>
+    <!-- Viewport mobile tag for sensible mobile support -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <!--STYLES-->
+    <link rel="stylesheet" href="/linker/styles/main.css">
+    <!--STYLES END-->
+    <!--SCRIPTS-->
+    <script src="/linker/js/jquery.js"></script>
+    <script src="/linker/js/underscore.js"></script>
+    <script src="/linker/js/backbone.js"></script>
+    <script src="/linker/js/socket.io.js"></script>
+    <script src="/linker/js/sails.io.js"></script>
+    <script src="/linker/js/app.js"></script>
+    <!--SCRIPTS END-->
+    <style>
+
+      *{
+        box-sizing: border-box;
+      }
+
+      section {
+        padding:20px;
+      }
+      #overlay {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        -o-transform : scaleX(-1);
+        -webkit-transform : scaleX(-1);
+        transform : scaleX(-1);
+        -ms-filter : fliph; /*IE*/
+        filter : fliph; /*IE*/
+
+        width : 600px;
+        height : 450px;
+      }
+
+      #videoel {
+/*        opacity: .5;*/
+        -o-transform : scaleX(-1);
+        -webkit-transform : scaleX(-1);
+        transform : scaleX(-1);
+        -ms-filter : fliph; /*IE*/
+        filter : fliph; /*IE*/
+
+        width : 600px;
+        height : 450px;
+      }
+      
+      #container {
+        position : relative;
+        width : 370px;
+        /*margin : 0px auto;*/
+      }
+      
+      #content {
+/*        margin-top : 50px;
+        margin-left : auto;
+        margin-right : auto;
+        max-width: 600px;*/
+      }
+      
+      #sketch, #filter {
+        display: none;
+      }
+      
+      h2 {
+        font-weight : 400;
+      }
+      
+      .btn {
+        font-size: 16px;
+      }
+
+      #controls {
+        /*text-align : center;*/
+      }
+
+      #emotion_container {
+        width: 600px;
+      }
+
+      #emotion_icons {
+        height: 50px;
+        padding-left: 40px;
+      }
+
+      .emotion_icon {
+        width : 40px;
+        height : 40px;
+        margin-top: 5px;
+        /*margin-left : 13px;*/
+        margin-left : 35px;
+      }
+
+      #emotion_chart, #emotion_icons {
+        /*margin: 0 auto;*/
+        width : 400px;
+      }
+
+      #icon1, #icon2, #icon3, #icon4, #icon5, #icon6 {
+        visibility : hidden;
+      }
+
+      /* d3 */
+      .bar {
+        fill : teal;
+        fill-opacity : .9;
+      }
+      .movement-temp{
+        background: white;
+        width:100px;
+        height:100px;
+        position:absolute;
+        z-index: 9999999999;
+        opacity:.5;
+        border-radius:100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script src="js/camera/utils.js"></script>
+    <script src="js/camera/clmtrackr.js"></script>
+    <script src="js/camera/model_pca_20_svm_emotionDetection.js"></script>
+    <script src="js/camera/Stats.js"></script>
+    <script src="js/camera/d3.js"></script>
+    <script src="js/camera/emotion_classifier.js"></script>
+    <script src="js/camera/emotionmodel.js"></script>
+
+    <%- body %>
+    <!-- <script src="js/camera.js"></script> -->
+    <!--TEMPLATES-->
+    
+    <!--TEMPLATES END-->
+  </body>
+</html>
