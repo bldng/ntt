@@ -13,11 +13,14 @@ body {
 #movement-temp {
   position: absolute;
   background: none;
+  margin-left:500px;
   width: 100px;
   height:100px;
   border-radius:100%;
   border:5px solid black;
-  -webkit-animation: breathing 2s infinite alternate;
+  //transition:.2s all;
+  //-webkit-transform: translate3d(0,0,0);
+  //-webkit-animation: breathing 1s infinite alternate;
 }
 
 //---------------------------------------------------------------------------------------
@@ -25,6 +28,100 @@ body {
 //---------------------------------------------------------------------------------------
 
 @-webkit-keyframes breathing {
-	0% 		{-webkit-transform: translateX(100px)}
-	100% 	{-webkit-transform: translateX(-100px)}
+	0% 		{-webkit-transform: translateX(-100px)}
+	100% 	{-webkit-transform: translateX(100px)}
+}
+
+//---------------------------------------------------------------------------------------
+//	circle
+//---------------------------------------------------------------------------------------
+
+.halo{
+  transition: .4s all;
+    &.input{
+    width:100px;
+    height:100px;
+      &:before{
+        width:100px;
+        height:100px;
+      }
+  }
+}
+
+@mixin rotator($color) {
+  position: absolute;
+  left:25%;
+  top: 40%;
+  transform: translate3d(-50%, -50%,0);
+  border:1px solid rgba($color,.3);
+  box-shadow:
+    0 0 20px rgba($color,.1),
+    0 0 50px rgba($color,.1),
+    inset 0 0 20px rgba($color,.1),
+    inset 0 0 50px rgba($color,.1)
+    ;
+  border-radius:100%;
+  width: 200px;
+  height: 200px;
+  -webkit-transform: scale(1);
+
+  &:before{
+    content:"";
+    position:absolute;
+    width:200px;
+    height:200px;
+    border-radius:100%;
+    border:1px solid rgba($color,.3);
+    box-shadow:
+    0 0 20px rgba($color,.1),
+    0 0 50px rgba($color,.1),
+    inset 0 0 20px rgba($color,.1),
+    inset 0 0 50px rgba($color,.1)
+    ;
+    -webkit-animation: rotate 3.5s infinite alternate-reverse;
+  }
+}
+.ring-1 {
+  @include rotator(aqua);
+  -webkit-animation: rotate 3.5s infinite alternate-reverse;
+}
+.ring-2 {
+  @include rotator(aqua);
+  -webkit-animation: rotate 2s infinite alternate;
+}
+.ring-3 {
+  @include rotator(aqua);
+  -webkit-animation: rotate-2 4s infinite alternate;
+}
+.ring-4 {
+  @include rotator(aqua);
+  -webkit-animation: rotate 7s infinite alternate-reverse;
+}
+.ring-5 {
+  @include rotator(#FF00FF);
+  -webkit-animation: rotate-2 5s infinite alternate;
+}
+.ring-6 {
+  @include rotator(aqua);
+  -webkit-animation: rotate 2s infinite alternate-reverse;
+}
+.ring-7 {
+  @include rotator(aqua);
+  -webkit-animation: rotate-2 5s infinite alternate;
+}
+.ring-8 {
+  @include rotator(#FF00FF);
+  -webkit-animation: rotate 10s infinite alternate-reverse;
+}
+
+
+@-webkit-keyframes rotate
+{
+  0% {-webkit-transform: rotate(360deg) scaleX(1)}
+  100% {-webkit-transform: rotate(0deg) scaleX(1.1) }
+}
+@-webkit-keyframes rotate-2
+{
+  0% {-webkit-transform: rotate(360deg) scaleX(.9) }
+  100% {-webkit-transform: rotate(90deg) scaleX(1.1) }
 }

@@ -17,6 +17,8 @@
 
 var sentiment = require('sentiment');
 
+var Speakable = require('speakable');
+
 module.exports = {
 	
 	index: function(req, res) {
@@ -32,6 +34,17 @@ module.exports = {
        	return res.send({
             sentiment: sentence.score
         })
+	},
+	speak: function(req, res) {
+		// var speakable = new Speakable();
+		// speakable.on('speechStart', function() {
+		//   console.log('onSpeechStart');
+		// });
+		// res.send('test');
+		return res.send({
+		     sentiment: "sentence.score"
+		 })
+		//console.log(sails);
 	},
 	// ask: function(req, res) {
 	// 	//test = res.send(r1);

@@ -1,18 +1,8 @@
-<h1>Display</h1>
+<!-- <h1>Display</h1>-->
 
-<textarea type="text" class="text" style="width:500px; font-size:20px; padding: 10px; margin:20px;"></textarea>
+<textarea type="text" class="text" style="width:500px; font-size:20px; padding: 10px; margin:20px; opacity:0.5"></textarea>
+<textarea id="speech-page-content" name="pageContent" style="opacity:0.5"></textarea>
+
+<!-- <span href="" class="button">Test sentence</span>  -->
+
 <div id="movement-temp"></div>
-
-<span href="" class="button">Test sentence</span>
-
-<script>
-$(document).ready(function(){
-
-	$('.button').on('click', function(event) {
-		event.preventDefault();
-		socket.get("/display/ask?sentence="+$('.text').val(), function (response) { 
-			console.log(response);
-		});
-	});
-});
-</script>
