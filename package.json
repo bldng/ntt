@@ -5,6 +5,7 @@
   "description": "a Sails application",
   "dependencies": {
     "ejs": "0.8.4",
+    "futures": "^2.3.3",
     "grunt": "0.4.1",
     "grunt-contrib-sass": "^0.7.3",
     "optimist": "0.3.4",
@@ -20,5 +21,6 @@
   "main": "app.js",
   "repository": "",
   "author": "",
-  "license": ""
+  "license": "",
+  "devDependencies": {}
 }

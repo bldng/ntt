@@ -53,6 +53,9 @@ $(document).ready(function(){
 	// $("#movement-temp").velocity({ left: 0 }, 1000, "swing");
 
 	function sentimentCheck() {
+		socket.get("/display/wit?sentence="+$('.text').val(), function (response) {
+			console.log(	response.msg_body, response.outcome	);
+		});
 		socket.get("/display/ask?sentence="+$('.text').val(), function (response) { 
 			console.log(	response['sentiment']	);
 			if (response['sentiment'] >= 1 ) {

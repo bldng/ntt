@@ -16,8 +16,9 @@
  */
 
 var sentiment = require('sentiment');
-
 var Speakable = require('speakable');
+var https = require('https');
+var Future = require('futures').future;
 
 module.exports = {
 	
@@ -45,6 +46,35 @@ module.exports = {
 		     sentiment: "sentence.score"
 		 })
 		//console.log(sails);
+	},
+	wit: function(req, res) {
+		var user_text = req.query.sentence;
+		var future = Future.create();
+	    var options = {
+	        host: 'api.wit.ai',
+	        path: '/message?q=' + encodeURIComponent(user_text),
+	        // the Authorization header allows you to access your Wit.AI account
+	        // make sure to replace it with your own
+	        headers: {'Authorization': 'Bearer XUTTJGYPZD2W2HICRIJBRLUQKTKPNA4W'}
+	    };
+
+	    https.request(options, function(response_server) {
+	        var response = '';
+
+	        response_server.on('data', function (chunk) {
+	            response += chunk;
+	        });
+
+	        response_server.on('end', function () {
+	            future.fulfill(undefined, JSON.parse(response));
+	            console.log(response);
+	            return res.send(JSON.parse(response));
+	        });
+	    }).on('error', function(e) {
+	        future.fulfill(e, undefined);
+	    }).end();
+
+	    return future
 	},
 	// ask: function(req, res) {
 	// 	//test = res.send(r1);
