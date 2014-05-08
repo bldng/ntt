@@ -50,7 +50,7 @@ body {
 
 @mixin rotator($color) {
   position: absolute;
-  left:25%;
+  left:43%;
   top: 40%;
   transform: translate3d(-50%, -50%,0);
   border:1px solid rgba($color,.3);
@@ -118,10 +118,10 @@ body {
 @-webkit-keyframes rotate
 {
   0% {-webkit-transform: rotate(360deg) scaleX(1)}
-  100% {-webkit-transform: rotate(0deg) scaleX(1.1) }
+  100% {-webkit-transform: rotate(0deg) scaleX(1.05) }
 }
 @-webkit-keyframes rotate-2
 {
   0% {-webkit-transform: rotate(360deg) scaleX(.9) }
-  100% {-webkit-transform: rotate(90deg) scaleX(1.1) }
+  100% {-webkit-transform: rotate(90deg) scaleX(1.05) }
 }

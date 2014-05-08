@@ -4,22 +4,28 @@
 		background-color: #000000;
 		margin: 0px;
 		overflow: hidden;
-		cursor:none;
+		/*cursor:none;*/
 	}
 
 	a {
-		color:#0078ff;
-	}
+/*		color:#0078ff;
+*/		padding: 20px;
+		color: #fff;
+}
 </style>
 <script src="/js/display/three.min.js"></script>
+<script src="/js/display/Tween.js"></script>
 
+<a class="test one">Test one</a>
+<a class="test two">Test two</a>
+<a class="test three">Test three</a>
 
 <div class="halo ring-1"></div>
 <div class="halo ring-2"></div>
-<div class="halo ring-3"></div>
+<!--<<div class="halo ring-3"></div>
 <div class="halo ring-4"></div>
 <div class="halo ring-5"></div>
-<div class="halo ring-6"></div>
+<div class="halo ring-6"></div>-->
 <div class="halo ring-7"></div>
 <div class="halo ring-8"></div>
 <script>
@@ -29,9 +35,9 @@
 	windowHalfX = window.innerWidth / 2,
 	windowHalfY = window.innerHeight / 2,
 
-	SEPARATION = 200,
-	AMOUNTX = 10,
-	AMOUNTY = 10,
+	// SEPARATION = 200,
+	// AMOUNTX = 10,
+	// AMOUNTY = 10,
 
 	camera, scene, renderer;
 
@@ -40,64 +46,122 @@
 
 	function init() {
 
-		var container, separation = 100, amountX = 50, amountY = 50,
+		var container, 
 		particles, particle;
 
 		container = document.createElement('div');
 		document.body.appendChild(container);
 
-		camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-		camera.position.z = 100;
-
 		scene = new THREE.Scene();
+		//camera.lookAt(scene.position);
+		
 
 		//scene.position.x = 500;
 
-		renderer = new THREE.CanvasRenderer();
+		renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setSize( window.innerWidth, window.innerHeight );
+
+		renderer.shadowMapEnabled = true;
+
 		container.appendChild( renderer.domElement );
 
-		// particles
+		camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+		camera.position.z = 100;
+		camera.target = scene.position;
+
+		//---------------------------------------------------------------------------------------
+		//	fog
+		//---------------------------------------------------------------------------------------
+
+		scene.fog = new THREE.Fog(0x000000, 1, 200); //1200
+
+		//---------------------------------------------------------------------------------------
+		//	light
+		//---------------------------------------------------------------------------------------
+
+		var lightAmbient = new THREE.HemisphereLight( 0x404040, 0x404040, 2 ); // soft white light
+		scene.add( lightAmbient );
+
+
+		var light = new THREE.PointLight( 0x66FFFF, 2, 200 );
+		light.position.set( 0, 0, 50 );
+
+
+		scene.add( camera );
+		camera.add( light );
+
+		//---------------------------------------------------------------------------------------
+		//	particles
+		//---------------------------------------------------------------------------------------
 
 		var PI2 = Math.PI * 2;
-		var material = new THREE.SpriteCanvasMaterial( {
+		var material = new THREE.MeshLambertMaterial( {
 
-			color: 0xffffff,
+			color: 0xff0000,
 			program: function ( context ) {
-
 				context.beginPath();
 				context.arc( 0, 0, 1, 0, PI2, true );
 				context.fill();
-
 			}
-
 		} );
 
 		var geometry = new THREE.Geometry();
+		var geometry2 = new THREE.SphereGeometry( 4, 32, 32 );
 
+		var particleMaterial = new THREE.MeshLambertMaterial({ 
+			color: 0xffffff,
+			fog: true
+		});
+
+		ParticleGroup = new THREE.Object3D();
 		for ( var i = 0; i < 100; i ++ ) {
-
-			particle = new THREE.Sprite( material );
+			var particle = new THREE.Mesh( geometry2, particleMaterial );
+			//particle = new THREE.Sprite( pyramidMaterial );
 			particle.position.x = Math.random() * 2 - 1;
 			particle.position.y = Math.random() * 2 - 1;
 			particle.position.z = Math.random() * 2 - 1;
 			particle.position.normalize();
-			particle.position.multiplyScalar( Math.random() * 10 + 450 );
-			particle.scale.x = particle.scale.y = 5;
-			scene.add( particle );
+			particle.position.multiplyScalar( Math.random() * 10 + 250 );
+			//particle.scale.x = particle.scale.y = particle.scale.z = 1;
+			ParticleGroup.add( particle );
 
 			geometry.vertices.push( particle.position );
 
 		}
 
-		// lines
+		//---------------------------------------------------------------------------------------
+		//	Lines
+		//---------------------------------------------------------------------------------------
 
-		var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.4 } ) );
-		scene.add( line );
+		var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xdddddd, opacity: .3,  transparent: true, linewidth: 1, fog: true} ) );
+		//scene.add( line );
+		ParticleGroup.add( line );
+		scene.add( ParticleGroup );
+
+		ParticleGroup.castShadow = true;
+		ParticleGroup.receiveShadow = false;
+
+		//---------------------------------------------------------------------------------------
+		//	circle
+		//---------------------------------------------------------------------------------------
+
+		// var geometry = new THREE.RingGeometry( 10, 15, 32 );
+		// var material = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
+		// var mesh = new THREE.Mesh( geometry, material );
+		// scene.add( mesh );
+
+		var radius   = 30,
+		    segments = 64,
+		    material = new THREE.LineBasicMaterial( { color: 0xffffff } ),
+		    geometry = new THREE.CircleGeometry( radius, segments );
+		    geometry.vertices.shift();
+
+		    //scene.add( new THREE.Line( geometry, material ) );
+
+
+		
 
 		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-		document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-		document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
 		//
 
@@ -126,38 +190,12 @@
 
 	}
 
-	function onDocumentTouchStart( event ) {
-
-		if ( event.touches.length > 1 ) {
-
-			event.preventDefault();
-
-			mouseX = event.touches[ 0 ].pageX - windowHalfX;
-			mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-		}
-
-	}
-
-	function onDocumentTouchMove( event ) {
-
-		if ( event.touches.length == 1 ) {
-
-			event.preventDefault();
-
-			mouseX = event.touches[ 0 ].pageX - windowHalfX;
-			mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-		}
-
-	}
-
 	//
 
 	function animate() {
 
 		requestAnimationFrame( animate );
-
+		TWEEN.update();
 		render();
 
 	}
@@ -165,20 +203,126 @@
 	function render() {
 
 
-		var positions = JSON.parse( localStorage.getItem('positions') );
+		//var positions = JSON.parse( localStorage.getItem('positions') );
 
 		// camera.position.x += ( positions.translateX - camera.position.x ) * .05;
 		// camera.position.y += ( - positions.translateY + 200 - camera.position.y ) * .05;
-		//camera.position.z = ( 4 - positions.scale) * 200;
+		// camera.position.z = ( 4 - positions.scale) * 200;
+		//if (localStorage.getItem('tracker')) {
+			//Number.prototype.map = function ( in_min , in_max , out_min , out_max ) {
+			  //return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
+			//}
 
-		camera.position.x += ( mouseX - camera.position.x ) * .05;
-		camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
+			//camera.position.z = 10 - positions.scale;
+			//var num=5;
+			//console.log( num.map( 0 , 10 , -50 , 50 ) );
+		//}
+
+		//camera.position.z = (positions.scale - camera.position.z) * .05;
+		//camera.fov += camera.fov * positions.scale;
+
+		// camera.position.x += ( mouseX - camera.position.x ) * .05;
+		// camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
 
 
 		camera.lookAt( scene.position );
+		//camera.lookAt( ParticleGroup.children[0].position );
 
 		renderer.render( scene, camera );
 
 	}
+
+	$(".one").click(function() {
+
+
+		var tween = new TWEEN.Tween(camera.position).to({
+			x: 0,
+			y: 0,
+			z: 0
+		}).easing(TWEEN.Easing.Linear.None).onUpdate(function () {
+		    camera.lookAt(camera.target);
+		}).onComplete(function () {
+		    camera.lookAt(ParticleGroup.children[0].position);
+		}).start();
+
+		var tween = new TWEEN.Tween(camera.target).to({
+		    x: ParticleGroup.children[0].position.x,
+		    y: ParticleGroup.children[0].position.y,
+		    z: ParticleGroup.children[0].position.z
+		}).easing(TWEEN.Easing.Linear.None).onUpdate(function () {
+		}).onComplete(function () {
+		    camera.lookAt(ParticleGroup.children[0].position);
+		}).start();
+
+	});
+
+	$(".two").click(function() {
+
+
+		var random = Math.floor(Math.random() * (100-1));
+
+		var tween = new TWEEN.Tween(camera.target).to({
+		    x: ParticleGroup.children[ random ].position.x,
+		    y: ParticleGroup.children[ random ].position.y,
+		    z: ParticleGroup.children[ random ].position.z
+		}, 1400).easing(TWEEN.Easing.Circular.InOut).onUpdate(function () {
+		}).onComplete(function () {
+			camera.fov = random;
+		    camera.lookAt(ParticleGroup.children[ random ].position);
+		}).start();
+
+		var tween = new TWEEN.Tween(camera.position).delay(100).to({
+			x: ParticleGroup.children[ random ].position.x + 10,
+			y: ParticleGroup.children[ random ].position.y,
+		    z: ParticleGroup.children[ random ].position.z + 10
+		}, 1800).easing(TWEEN.Easing.Exponential.InOut).onUpdate(function () {
+		    camera.lookAt(camera.target);
+		}).onComplete(function () {
+		    camera.lookAt(ParticleGroup.children[ random ].position);
+		}).start();
+
+	});
+
+
+	var oddClick = true;
+
+	$(".three").click(function() {
+
+		// var random = Math.floor(Math.random() * (100-1));
+
+		// var tween = new TWEEN.Tween(camera.position).to({
+		//     x: ParticleGroup.children[ random ].position.x,
+		//     y: ParticleGroup.children[ random ].position.y,
+		//     z: ParticleGroup.children[ random ].position.z + 10
+		// }, 2000).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(function () {
+		//     camera.lookAt(camera.target);
+		// }).onComplete(function () {
+		//     camera.lookAt(ParticleGroup.children[ random ].position);
+		// }).start();
+
+		// var tween = new TWEEN.Tween(camera.target).to({
+		//     x: ParticleGroup.children[ random ].position.x,
+		//     y: ParticleGroup.children[ random ].position.y,
+		//     z: ParticleGroup.children[ random ].position.z
+		// }, 2000).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(function () {
+		// }).onComplete(function () {
+		// 	camera.fov = random;
+		//     camera.lookAt(ParticleGroup.children[ random ].position);
+		// }).start();
+
+		fogValue = oddClick ? 600 : 200;
+		oddClick = !oddClick;
+
+
+		var tween = new TWEEN.Tween(scene.fog).to({
+		    far: fogValue
+		}, 2000).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(function () {
+		}).onComplete(function () {
+		}).start();
+
+
+
+	});
+
 
 </script>

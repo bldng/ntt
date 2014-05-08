@@ -120,7 +120,7 @@
     $(document).ready(function () {
         //console.log('works');
         startVideo();
-        updateValues('SmileTest');
+        // updateValues('SmileTest');
     });
 
     function updateValues(name) {
@@ -253,9 +253,9 @@
       data(emotionData).
       enter().
       append("svg:rect").
-      attr("x", function(datum, index) { return x(index); }).
-      attr("y", function(datum) { return height - y(datum.value); }).
-      attr("height", function(datum) { return y(datum.value); }).
+      attr("x", function(flexibleValue, index) { return x(index); }).
+      attr("y", function(flexibleValue) { return height - y(flexibleValue.value); }).
+      attr("height", function(flexibleValue) { return y(flexibleValue.value); }).
       attr("width", barWidth).
       attr("fill", "#2d578b");
 
@@ -263,24 +263,24 @@
       data(emotionData).
       enter().
       append("svg:text").
-      attr("x", function(datum, index) { return x(index) + barWidth; }).
-      attr("y", function(datum) { return height - y(datum.value); }).
+      attr("x", function(flexibleValue, index) { return x(index) + barWidth; }).
+      attr("y", function(flexibleValue) { return height - y(flexibleValue.value); }).
       attr("dx", -barWidth/2).
       attr("dy", "1.2em").
       attr("text-anchor", "middle").
-      text(function(datum) { return datum.value;}).
+      text(function(flexibleValue) { return flexibleValue.value;}).
       attr("fill", "white").
       attr("class", "labels");
 
     svg.selectAll("text.yAxis").
       data(emotionData).
       enter().append("svg:text").
-      attr("x", function(datum, index) { return x(index) + barWidth; }).
+      attr("x", function(flexibleValue, index) { return x(index) + barWidth; }).
       attr("y", height).
       attr("dx", -barWidth/2).
       attr("text-anchor", "middle").
       attr("style", "font-size: 12").
-      text(function(datum) { return datum.emotion;}).
+      text(function(flexibleValue) { return flexibleValue.emotion;}).
       attr("transform", "translate(0, 18)").
       attr("class", "yAxis");
 
@@ -288,12 +288,12 @@
         // update
         var rects = svg.selectAll("rect")
             .data(data)
-            .attr("y", function(datum) { return height - y(datum.value); })
-            .attr("height", function(datum) { return y(datum.value); });
+            .attr("y", function(flexibleValue) { return height - y(flexibleValue.value); })
+            .attr("height", function(flexibleValue) { return y(flexibleValue.value); });
         var texts = svg.selectAll("text.labels")
             .data(data)
-            .attr("y", function(datum) { return height - y(datum.value); })
-            .text(function(datum) { return datum.value.toFixed(1);});
+            .attr("y", function(flexibleValue) { return height - y(flexibleValue.value); })
+            .text(function(flexibleValue) { return flexibleValue.value.toFixed(1);});
 
         // enter 
         rects.enter().append("svg:rect");
@@ -302,14 +302,20 @@
 
         if (data[0].value > .7){
             console.log('angry');
-
+            updateValues('Angry');
             // read value set value++
 
             //document.getElementById('movement-temp').style.background= 'red';
         } else if (data[3].value > .7){
             console.log('happy');
+            updateValues('Smile');
             //document.getElementById('movement-temp').style.background= 'green';
-        } else {
+        } 
+        // else if (data[1].value > .7){
+        //     console.log('sad');
+        //     updateValues('Sad');
+        // } 
+        else {
             //document.getElementById('movement-temp').style.background= 'white';
         }
 

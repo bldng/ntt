@@ -18,6 +18,7 @@
 var sentiment = require('sentiment');
 var Speakable = require('speakable');
 var https = require('https');
+var http = require('http');
 var Future = require('futures').future;
 
 module.exports = {
@@ -76,6 +77,50 @@ module.exports = {
 
 	    return future
 	},
+
+	news: function(req,res) {
+
+		var url = "http://content.guardianapis.com/search?section=world&page-size=50&order-by=relevance&show-fields=body&date-id=date%2Fyesterday&show-redistributable-only=body&api-key=mhe363khxt4dbm85vpewe2ev"
+		http.get(url, function(response) {
+		    var body = '';
+		    var articles;
+
+		    response.on('data', function(chunk) {
+		        body += chunk;
+		    });
+
+		    response.on('end', function() {
+
+		    	var allArticles = '';
+
+		        var responseFull = JSON.parse(body);
+		        var articles = responseFull.response.results.length;
+
+		        for (var i = articles - 1; i >= 0; i--) {
+
+		        	var sentence = responseFull.response.results[i].fields.body; // get text
+		        	var stripped = sentence.replace(/(<([^>]+)>)/g,""); // strip html
+
+		        	allArticles += stripped;
+		        };
+
+		        var analysed = sentiment(allArticles);
+
+		        return res.send({
+		             numberwang: analysed.score,
+		             'analysed articles': articles,
+		             'positive words total': analysed.positive.length,
+		             'negative words total': analysed.negative.length,
+		             positive: analysed.positive,
+		             negative: analysed.negative
+
+		         })
+		    });
+		}).on('error', function(e) {
+		      console.log("Got error: ", e);
+		});
+	},
+
 	// ask: function(req, res) {
 	// 	//test = res.send(r1);
 	// 	var r2 = sentiment('Dogs are fucking stupid.');
