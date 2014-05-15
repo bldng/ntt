@@ -55,9 +55,6 @@ $(document).ready(function(){
 	function sentimentCheck() {
 		socket.get("/display/wit?sentence="+$('.text').val(), function (response) {
 			console.log(	response.msg_body, response.outcome	);
-			if (response.outcome.intent == 'ok') {
-				console.log('trigger ok function');
-			}
 		});
 		socket.get("/display/ask?sentence="+$('.text').val(), function (response) { 
 			console.log(	response['sentiment']	);

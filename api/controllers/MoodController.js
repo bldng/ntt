@@ -33,7 +33,25 @@ module.exports = {
 		      });
 		  }
 		});
-	    },
+	},
+
+	ratio: function (req,res) {
+		Mood.find().done(function(err, collection) {
+
+			var angry = collection.filter(function (item) { return item.name == "Angry" });
+			var smile = collection.filter(function (item) { return item.name == "Smile" });
+
+			percentage = (parseInt(smile[0].value) / ( parseInt(angry[0].value) + parseInt(smile[0].value) )) * 100;
+
+			res.json({
+				angry: parseInt(angry[0].value), 
+				smile: parseInt(smile[0].value),
+				total: parseInt(angry[0].value) + parseInt(smile[0].value),
+				diff: parseInt(smile[0].value) - parseInt(angry[0].value),
+				percentage: percentage.toFixed(2)
+				});
+		});
+	},
     
     // foo: function(req, res) {
     // 	//var message = 'Hallo Wurst' + req.toJSON();

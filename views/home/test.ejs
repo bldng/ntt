@@ -7,27 +7,45 @@
 		/*cursor:none;*/
 	}
 
-	a {
-/*		color:#0078ff;
-*/		padding: 20px;
-		color: #fff;
+	.showTutorial {
+		left:13%;
+		top: 75%;
+		-webkit-transform: scale(2);
+	}
 }
 </style>
 <script src="/js/display/three.min.js"></script>
 <script src="/js/display/Tween.js"></script>
+<script src="/js/display/velocity.js"></script>
 
-<a class="test one">Test one</a>
-<a class="test two">Test two</a>
-<a class="test three">Test three</a>
+<div class="content hidden">
+	<div class="content-body"></div>
+</div>
 
 <div class="halo ring-1"></div>
 <div class="halo ring-2"></div>
-<!--<<div class="halo ring-3"></div>
+<!--<div class="halo ring-3"></div>
 <div class="halo ring-4"></div>
 <div class="halo ring-5"></div>
 <div class="halo ring-6"></div>-->
 <div class="halo ring-7"></div>
 <div class="halo ring-8"></div>
+<div class="halo mood"></div>
+
+
+<div class="stats hidden">
+	<div class="links">
+		<a class="test one">Origin</a>
+		<a class="test two">Task</a>
+		<a class="test three">Depth</a>
+	</div>
+	<div style="padding-left:20px; padding-top:20px;">Interim</div>
+	<textarea id="speech-page-content" style="" name="pageContent" ></textarea>
+	<div style="padding-left:20px; padding-top:20px;">Result</div>
+	<textarea type="text" class="text" style=""></textarea>
+</div>
+
+
 <script>
 
 	var mouseX = 0, mouseY = 0,
@@ -50,6 +68,7 @@
 		particles, particle;
 
 		container = document.createElement('div');
+		container.setAttribute("id", "Div1")
 		document.body.appendChild(container);
 
 		scene = new THREE.Scene();
@@ -65,7 +84,7 @@
 
 		container.appendChild( renderer.domElement );
 
-		camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 		camera.position.z = 100;
 		camera.target = scene.position;
 
@@ -129,42 +148,41 @@
 
 		}
 
+		dust = new THREE.Object3D();
+		for ( var i = 0; i < 300; i ++ ) {
+			var base = new THREE.Geometry();
+			var geometry3 = new THREE.SphereGeometry( .5, 10, 10 );
+			var particle2 = new THREE.Mesh( geometry3, particleMaterial );
+			//particle = new THREE.Sprite( pyramidMaterial );
+			particle2.position.x = Math.random() * 2 - 1;
+			particle2.position.y = Math.random() * 2 - 1;
+			particle2.position.z = Math.random() * 2 - 1;
+			particle2.position.normalize();
+			particle2.position.multiplyScalar( Math.random() * (125 - 10) + 125 ); // * (max - min) + min;
+			//particle2.scale.x = particle2.scale.y = particle2.scale.z = 1;
+			dust.add( particle2 );
+
+			base.vertices.push( particle2.position );
+
+		}
+
+		scene.add(dust);
+
 		//---------------------------------------------------------------------------------------
 		//	Lines
 		//---------------------------------------------------------------------------------------
 
-		var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xdddddd, opacity: .3,  transparent: true, linewidth: 1, fog: true} ) );
+		//var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xdddddd, opacity: .3,  transparent: true, linewidth: 2, fog: true} ) );
+		var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0xffffff, opacity: .6,  transparent: true, linewidth: 2, fog: true} ) );
 		//scene.add( line );
+
 		ParticleGroup.add( line );
 		scene.add( ParticleGroup );
 
 		ParticleGroup.castShadow = true;
 		ParticleGroup.receiveShadow = false;
 
-		//---------------------------------------------------------------------------------------
-		//	circle
-		//---------------------------------------------------------------------------------------
-
-		// var geometry = new THREE.RingGeometry( 10, 15, 32 );
-		// var material = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
-		// var mesh = new THREE.Mesh( geometry, material );
-		// scene.add( mesh );
-
-		var radius   = 30,
-		    segments = 64,
-		    material = new THREE.LineBasicMaterial( { color: 0xffffff } ),
-		    geometry = new THREE.CircleGeometry( radius, segments );
-		    geometry.vertices.shift();
-
-		    //scene.add( new THREE.Line( geometry, material ) );
-
-
-		
-
 		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-		//
-
 		window.addEventListener( 'resize', onWindowResize, false );
 
 	}
@@ -224,40 +242,118 @@
 		// camera.position.x += ( mouseX - camera.position.x ) * .05;
 		// camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
 
+		//camera.rotation.z += ( camera.rotation.z ) * .005;
 
-		camera.lookAt( scene.position );
+		dust.rotation.y += .0001;
+		dust.rotation.x -= .0002;
+
+		//camera.lookAt( scene.position );
 		//camera.lookAt( ParticleGroup.children[0].position );
 
 		renderer.render( scene, camera );
 
 	}
 
+	var person = false;
+	returnToOrigin();
+
+	// $(window).bind('storage', function (e) {
+	//     if (JSON.parse(localStorage.getItem('tracker')) == false) {
+	//     	setTimeout(function() {
+	//     		if (JSON.parse(localStorage.getItem('tracker')) == false) {
+	//     			returnToOrigin();
+	//     		}
+	//     	}, 10000);
+	//     } else {
+	//     	if (person !== true) {
+	//     		showTutorial();
+	//     		person = true;
+	//     	}
+	//     }
+	// });
+
+	function showTutorial () {
+		var position = $('.halo').position();
+
+		var tween = new TWEEN.Tween(  position   )
+			.to( { top: 700 , left:0}, 500 )
+			.repeat(3)
+			.yoyo(true)
+			.easing( TWEEN.Easing.Circular.Out)
+			.onUpdate( function () {
+				$('.halo').css({top: this.top +'px', left: this.left +'px'});
+			} )
+			.start();
+		return person = true;
+		person = true;
+	}
+
+	function returnToOrigin () {
+			hideContent();
+			var tween = new TWEEN.Tween(camera.position).to({
+				x: 0,
+				y: 0,
+				z: 0
+			}).easing(TWEEN.Easing.Circular.InOut).onUpdate(function () {
+			    camera.lookAt(camera.target);
+			}).onComplete(function () {
+			    camera.lookAt(ParticleGroup.children[0].position);
+			}).start();
+
+			var tween = new TWEEN.Tween(camera.target).to({
+			    x: ParticleGroup.children[0].position.x,
+			    y: ParticleGroup.children[0].position.y,
+			    z: ParticleGroup.children[0].position.z
+			}).easing(TWEEN.Easing.Circular.InOut).onUpdate(function () {
+			}).onComplete(function () {
+			    camera.lookAt(ParticleGroup.children[0].position);
+			}).start();
+	}
+
+	function hideContent (argument) {
+		$(".content").addClass('hidden');
+		$(".content-body").velocity({ 
+		    opacity: 0,
+		},{
+			duration: 100
+		});
+		$('.content-body').empty();
+		console.log('cleared');
+	}
+
+	function showContent (argument) {
+		$(".content").removeClass('hidden');
+		$(".content-body").velocity({ 
+		    opacity: 1,
+		}, { 
+	    delay: 1400
+		});
+	}
+
+
 	$(".one").click(function() {
+		//$(".halo").velocity({ borderColorRed: '0', borderColorGreen: '0', borderColorBlue: '0', border: 10},  200, "swing").velocity("reverse", 1000);
 
-
-		var tween = new TWEEN.Tween(camera.position).to({
-			x: 0,
-			y: 0,
-			z: 0
-		}).easing(TWEEN.Easing.Linear.None).onUpdate(function () {
-		    camera.lookAt(camera.target);
-		}).onComplete(function () {
-		    camera.lookAt(ParticleGroup.children[0].position);
-		}).start();
-
-		var tween = new TWEEN.Tween(camera.target).to({
-		    x: ParticleGroup.children[0].position.x,
-		    y: ParticleGroup.children[0].position.y,
-		    z: ParticleGroup.children[0].position.z
-		}).easing(TWEEN.Easing.Linear.None).onUpdate(function () {
-		}).onComplete(function () {
-		    camera.lookAt(ParticleGroup.children[0].position);
-		}).start();
-
+		// var tween = new TWEEN.Tween(  { x: 50, y: 0 }  )
+		// 	.to( { x: 10 y: 10}, 500 )
+		// 	.repeat(3)
+		// 	.yoyo(true)
+		// 	.easing( TWEEN.Easing.Circular.Out)
+		// 	.onUpdate( function () {
+		// 		$('.halo').css({border: this.x +'px solid black'});
+		// 	} )
+		// 	.start();
+		// returnToOrigin();
+		// if (!person) {
+		// 	showTutorial();
+		// }
+		nope();
 	});
 
-	$(".two").click(function() {
 
+
+	$(".two").click(function() {
+		hideContent();
 
 		var random = Math.floor(Math.random() * (100-1));
 
@@ -280,6 +376,10 @@
 		}).onComplete(function () {
 		    camera.lookAt(ParticleGroup.children[ random ].position);
 		}).start();
+
+		//$('.content').removeClass('hidden');
+
+		showContent();
 
 	});
 
@@ -324,5 +424,91 @@
 
 	});
 
+    //---------------------------------------------------------------------------------------
+    //	Speech
+    //---------------------------------------------------------------------------------------
+
+    function sentimentCheck() {
+    	socket.get("/display/wit?sentence="+$('.text').val(), function (response) {
+    		//console.log(	response.msg_body, response.outcome, sentence.score	);
+    		console.log(response.wit.outcome.intent, response.wit.outcome.confidence, response.sentiment.score);
+    		reaction(response.wit.outcome.intent, response.wit.outcome.confidence, response.sentiment.score);
+    		console.log(response);
+
+    		// if (response.outcome.intent == 'ok' && response.outcome.confidence > 0.5) {
+    		// 	$( ".two" ).trigger( "click" );
+    		// }
+    		//reaction(response.outcome.intent,response.outcome.confidence,response.outcome.confidence);
+    	});
+    	// socket.get("/display/ask?sentence="+$('.text').val(), function (response) { 
+    	// 	console.log(	response['sentiment']	);
+    	// 	if (response['sentiment'] >= 1 ) {
+    	// 		$("#movement-temp").velocity({ borderColorRed: '0', borderColorGreen: '128', borderColorBlue: '255' },  200, "swing");
+    	// 		$("#movement-temp").velocity({ borderColorRed: '0', borderColorGreen: '0', borderColorBlue: '0' }, { delay: 200 }, 1000, "swing");
+    	// 	} else if (response['sentiment'] <= -1 ) {
+    	// 		$("#movement-temp").velocity({ borderColorRed: '255', borderColorGreen: '0', borderColorBlue: '0' },  200, "swing");
+    	// 		$("#movement-temp").velocity({ borderColorRed: '0', borderColorGreen: '0', borderColorBlue: '0' }, { delay: 200 }, 1000, "swing");
+    	// 	}
+    	// });
+    }
+
+    var recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en_US";
+    //serviceURI = "https://www.google.com/speech-api/v1/recognize?xjerr=1&pfilter=0&client=chromium&lang=en-US",
+    //recognition.start();
+
+    recognition.onresult = function (event) {
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                //insertAtCaret(textAreaID, event.results[i][0].transcript);
+                $('.text').val(event.results[i][0].transcript);
+                sentimentCheck();
+            } else {
+                // Outputting the interim result to the text field and adding
+                // an interim result marker - 0-length space
+                $('#speech-page-content').val(event.results[i][0].transcript + '\u200B');
+                // insertAtCaret(textAreaID, event.results[i][0].transcript + '\u200B');
+                // interimResult += event.results[i][0].transcript + '\u200B';
+            }
+        }
+    };
+    recognition.onend = function() {
+    	if (toggleSpeech) {
+    		recognition.start();
+    		console.log('restarted voice recognition...');
+    	}
+    };
+
+
+	//---------------------------------------------------------------------------------------
+	//	Toggle stats
+	//---------------------------------------------------------------------------------------
+
+
+    var toggleStats = false;
+
+    $(document).keypress(function(event) {
+        if (event.which == 32) {
+        	$('.stats').toggleClass('hidden');
+            // $('.stats').css({opacity: toggleStats ? '0' : '1'});
+            // toggleStats = !toggleStats;
+        }
+    });
+
+	//---------------------------------------------------------------------------------------
+	//	Toggle speech
+	//---------------------------------------------------------------------------------------
+
+
+    var toggleSpeech = true;
+
+    $(document).keypress(function(event) {
+        if (event.which == 115) {
+            toggleSpeech ? recognition.stop() : recognition.start();
+            toggleSpeech = !toggleSpeech;
+        }
+    });
 
 </script>

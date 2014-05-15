@@ -352,8 +352,8 @@ var clm = {
 				translateX = currentParameters[2];
 				translateY = currentParameters[3];
 
-				// var positions = { 'translateX': Math.round(translateX), 'translateY': translateY, 'scale': scaling };
-				// localStorage.setItem('positions', JSON.stringify(positions));
+				var positions = { 'translateX': Math.round(translateX), 'translateY': translateY, 'scale': scaling };
+				localStorage.setItem('positions', JSON.stringify(positions));
 
 			}
 			
@@ -374,7 +374,7 @@ var clm = {
 			var patchPositions = calculatePositions(currentParameters, false);
 			
 			// check whether tracking is ok
-			if (scoringWeights && (facecheck_count %10 == 0)) {
+			if (scoringWeights && (facecheck_count % 10 == 0)) {
 				if (!checkTracking()) {
 					// reset all parameters
 					first = true;

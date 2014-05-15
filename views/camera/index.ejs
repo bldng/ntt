@@ -1,20 +1,24 @@
 <section style="width:49%; display:inline-block; position:absolute;">
   <div>
     <h1>Values</h1>
-    <button id="postMessageButton">Update</button>
+    <button id="postMessageButton">Manual Update Test</button>
+    <button id="postMessageButton2">Manual Mood Test</button>
     <div id="values"></div>
+    <div id="mood"></div>
+    <progress class="mood-expression" max="100" value="50"></progress>
     
-    <h2>Static collection:</h2>
+<!--     <h2>Static collection:</h2>
     <ul>
       <% _.each(corndogs, function (corndog) { %>
       <li><%= corndog.name %></li>
       <% }) %>
-    </ul>
+    </ul> -->
+
   </div>
 </section>
 
 
-<section style="width:49%; display:inline-block; position:absolute; right:0;">
+<section class="camera" style="width:640px; height: 100%; display:inline-block; position:absolute; right:0; background:#222; color: white;">
 <h1>Camera</h1> 
 <div id="content">
   <div id="container">
@@ -23,17 +27,22 @@
   <!-- <canvas id="sketch" width="400" height="300"></canvas> -->
   <div id="emotion_container">
     <div id="emotion_icons">
-      <img class="emotion_icon" id="icon1" src="/js/camera/icon_angry.png">
+      <img class="emotion_icon" id="icon1" src="/js/camera/icon.png">
+      <img class="emotion_icon" id="icon2" src="/js/camera/icon.png">
+      <img class="emotion_icon" id="icon3" src="/js/camera/icon.png">
+      <img class="emotion_icon" id="icon4" src="/js/camera/icon.png">
+<!--       <img class="emotion_icon" id="icon1" src="/js/camera/icon_angry.png">
       <img class="emotion_icon" id="icon2" src="/js/camera/icon_sad.png">
       <img class="emotion_icon" id="icon3" src="/js/camera/icon_surprised.png">
-      <img class="emotion_icon" id="icon4" src="/js/camera/icon_happy.png">
+      <img class="emotion_icon" id="icon4" src="/js/camera/icon_happy.png"> -->
     </div>
+    <br/>
     <div id="emotion_chart"></div>
   </div>
 <!--   <div id="controls">
     <input class="btn" type="button" value="start" onclick="startVideo()" id="startbutton">
   </div> -->
-</div><canvas width="11px" height="781px" id="renderCanvas" style="display:none;"></canvas>
+</div><!-- <canvas width="11px" height="781px" id="renderCanvas" style="display:none;"></canvas> -->
 </section>
 
 
@@ -98,24 +107,47 @@
         el: '#values',
         initialize: function () {
             this.collection.on('change:value add', this.render, this);
-            this.render();
+            this.collection.fetch();
+            //this.render();
         },
         template: _.template("<div><p><b>{{ name }}: </b>{{ value }}</p></div>"),
         render: function () {
                 this.$el.html("");
                 this.collection.each(function(msg){
                     this.$el.append(this.template(msg.toJSON()));
-                }, this)
+                }, this);
+                socket.get('/mood/ratio', function (data) {
+                    $('.mood-expression').val(data.percentage);
+                    //$('#mood').html('<progress max="'+data.total+'" value="'+data.smile+'"></progress>');
+                });
         }
     });
 
-    var mView = new MessagesView({collection: messages});
+
+    var statsView = new MessagesView({collection: messages});
+    
+
+    //---------------------------------------------------------------------------------------
+    //    socket test
+    //---------------------------------------------------------------------------------------
 
     $("#postMessageButton").click(function(){
         socket.get("/mood/1", function (response) { 
             socket.put('/mood/1',{'value': parseInt(response.value)+1});
         });
     });
+
+    $("#postMessageButton2").click(function(){
+        socket.get('/mood/ratio', function (data) {
+            //<progress max="39569" value="3474"></progress>
+            console.log(data);
+            $('#mood').html('<progress max="'+data.total+'" value="'+data.smile+'"></progress>');
+        });
+    });
+
+    //---------------------------------------------------------------------------------------
+    //    video foo
+    //---------------------------------------------------------------------------------------
 
     $(document).ready(function () {
         //console.log('works');
@@ -138,9 +170,9 @@
     /********** check and set up video/webcam **********/
 
     function enablestart() {
-        var startbutton = document.getElementById('startbutton');
-        startbutton.value = "start";
-        startbutton.disabled = null;
+        // var startbutton = document.getElementById('startbutton');
+        // startbutton.value = "start";
+        // startbutton.disabled = null;
     }
 
     /*var insertAltVideo = function(video) {
@@ -187,7 +219,7 @@
         alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");
     }
 
-    vid.addEventListener('canplay', enablestart, false);
+    //vid.addEventListener('canplay', enablestart, false);
 
     /*********** setup of emotion detection *************/
 
@@ -204,11 +236,28 @@
     }
 
     function drawLoop() {
+        var halfPI = Math.PI/2;
         requestAnimFrame(drawLoop);
         overlayCC.clearRect(0, 0, 400, 300);
         //psrElement.innerHTML = "score :" + ctrack.getScore().toFixed(4);
         if (ctrack.getCurrentPosition()) {
             ctrack.draw(overlay);
+            var cp = ctrack.getCurrentParameters();
+            rotation = halfPI - Math.atan((cp[0]+1)/cp[1]);
+            if (rotation > halfPI) {
+                rotation -= Math.PI;
+            }
+            scaling = cp[1] / Math.sin(rotation);
+            translateX = cp[2];
+            translateY = cp[3];
+            var positions = { 'translateX': Math.round(translateX), 'translateY': translateY, 'scale': scaling };
+            if (scaling > 1.3 ) {
+                localStorage.setItem('positions', JSON.stringify(positions));
+                localStorage.setItem("tracker",false);
+            } else {
+                localStorage.setItem('positions', JSON.stringify(positions));
+                localStorage.setItem("tracker",false);
+            }
         }
         var cp = ctrack.getCurrentParameters();
         
@@ -216,7 +265,7 @@
         if (er) {
             updateData(er);
             for (var i = 0;i < er.length;i++) {
-                if (er[i].value > 0.4) {
+                if (er[i].value > 0.7) {
                     document.getElementById('icon'+(i+1)).style.visibility = 'visible';
                 } else {
                     document.getElementById('icon'+(i+1)).style.visibility = 'hidden';
@@ -231,43 +280,77 @@
 
     /************ d3 code for barchart *****************/
 
-    var margin = {top : 20, right : 20, bottom : 10, left : 40},
-        width = 400 - margin.left - margin.right,
-        height = 100 - margin.top - margin.bottom;
+    var margin = {top : 0, right : 20, bottom : 0, left : 40},
+        width = 600 - margin.left - margin.right,
+        height = 200 - margin.top - margin.bottom;
 
-    var barWidth = 30;
+    var barWidth = 5;
 
     var formatPercent = d3.format(".0%");
 
     var x = d3.scale.linear()
-        .domain([0, ec.getEmotions().length]).range([margin.left, width+margin.left]);
+        .domain([0, ec.getEmotions().length]).range([0, 2000]);
 
     var y = d3.scale.linear()
-        .domain([0,1]).range([0, height]);
+        //.domain([0,1]).range([0, height]);
+        .domain([0, ec.getEmotions().length]).range([margin.top, height+margin.top]);
 
     var svg = d3.select("#emotion_chart").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
 
-    svg.selectAll("rect").
+    // var rectangle = svg.append("rect")
+    //                     .attr("x", 10)
+    //                     .attr("y", 10)
+    //                     .attr("width", 50)
+    //                     .attr("height", 100);
+
+    svg.selectAll(".areas").
       data(emotionData).
       enter().
       append("svg:rect").
-      attr("x", function(flexibleValue, index) { return x(index); }).
-      attr("y", function(flexibleValue) { return height - y(flexibleValue.value); }).
-      attr("height", function(flexibleValue) { return y(flexibleValue.value); }).
-      attr("width", barWidth).
-      attr("fill", "#2d578b");
+      attr("x", function(flexibleValue, index) { return 0 }).
+      attr("y", function(flexibleValue, index) { return y(index) }).
+      attr("height", 35).
+      attr("width", 600 ).
+      attr("class", "areas").
+      attr("fill", "#333");
+
+    svg.selectAll(".background").
+      data(emotionData).
+      enter().
+      append("svg:rect").
+      attr("x", function(flexibleValue, index) { return 0 }).
+      attr("y", function(flexibleValue, index) { return y(index) }).
+      attr("height", barWidth).
+      attr("width", 500 ).
+      attr("class", "background").
+      attr("class", "background").
+      attr("fill", "black");
+
+    svg.selectAll(".rects").
+      data(emotionData).
+      enter().
+      append("svg:rect").
+      attr("x", function(flexibleValue, index) { return 0 }).
+      attr("y", function(flexibleValue, index) { return y(index) }).
+      attr("height", barWidth).
+      attr("width", 600 ).
+      attr("class", "rects").
+      attr("fill", "aqua");
 
     svg.selectAll("text.labels").
       data(emotionData).
       enter().
       append("svg:text").
-      attr("x", function(flexibleValue, index) { return x(index) + barWidth; }).
-      attr("y", function(flexibleValue) { return height - y(flexibleValue.value); }).
+      attr("x", function(flexibleValue, index) { return width }).
+      attr("y", function(flexibleValue, index) { return y(index) + barWidth; }).
+      //attr("y", function(flexibleValue) { return height - y(flexibleValue.value); }).
+      //attr("x", function(flexibleValue) { return height - x(flexibleValue.value); }).
       attr("dx", -barWidth/2).
       attr("dy", "1.2em").
-      attr("text-anchor", "middle").
+      attr("text-anchor", "left").
+      attr("style", "font-size: 12").
       text(function(flexibleValue) { return flexibleValue.value;}).
       attr("fill", "white").
       attr("class", "labels");
@@ -275,27 +358,35 @@
     svg.selectAll("text.yAxis").
       data(emotionData).
       enter().append("svg:text").
-      attr("x", function(flexibleValue, index) { return x(index) + barWidth; }).
-      attr("y", height).
+      // attr("x", function(flexibleValue, index) { return x(index) + barWidth; }).
+      // attr("y", height).
+      attr("x", function(flexibleValue, index) { return 5 }).
+      attr("y", function(flexibleValue, index) { return y(index) + barWidth; }).
       attr("dx", -barWidth/2).
-      attr("text-anchor", "middle").
-      attr("style", "font-size: 12").
+      attr("text-anchor", "left").
+      attr("style", "font-size: 14").
+      attr("fill", "white").
       text(function(flexibleValue) { return flexibleValue.emotion;}).
       attr("transform", "translate(0, 18)").
       attr("class", "yAxis");
 
     function updateData(data) {
         // update
-        var rects = svg.selectAll("rect")
+
+        var rects = svg.selectAll(".rects")
             .data(data)
-            .attr("y", function(flexibleValue) { return height - y(flexibleValue.value); })
-            .attr("height", function(flexibleValue) { return y(flexibleValue.value); });
+            //.attr("y", function(flexibleValue) { return height - y(flexibleValue.value); })
+            //.attr("x", function(flexibleValue) { return x(flexibleValue.value); })
+            //.attr("height", function(flexibleValue) { return y(flexibleValue.value); })
+            .attr("width", function(flexibleValue) { return x(flexibleValue.value); });
         var texts = svg.selectAll("text.labels")
             .data(data)
-            .attr("y", function(flexibleValue) { return height - y(flexibleValue.value); })
+            //.attr("y", function(flexibleValue) { return height - y(flexibleValue.value); })
+            //.attr("x", function(flexibleValue) { return height - x(flexibleValue.value); })
             .text(function(flexibleValue) { return flexibleValue.value.toFixed(1);});
 
-        // enter 
+
+        // enter
         rects.enter().append("svg:rect");
         texts.enter().append("svg:text");
         //console.log(data[0].value);
@@ -344,5 +435,22 @@
     document.addEventListener('clmtrackrIteration', function(event) {
         stats.update();
     }, false);
+
+    //---------------------------------------------------------------------------------------
+    //    Hide Camera
+    //---------------------------------------------------------------------------------------
+
+    var toggleStats = false;
+
+    $(document).keypress(function(event) {
+        event.preventDefault();
+        if (event.which == 32) {
+            $('.camera').toggleClass('hidden');
+            // $('.stats').css({opacity: toggleStats ? '0' : '1'});
+            toggleStats ? vid.play() : vid.stop();
+            toggleStats = !toggleStats;
+        }
+    });
+
 </script>
 
