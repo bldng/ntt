@@ -10,6 +10,11 @@ body {
   box-sizing: border-box;
 }
 
+h1 {
+  font-weight: normal;
+  color: white;
+}
+
 
 
 //---------------------------------------------------------------------------------------
@@ -45,6 +50,26 @@ body {
 }
 
 
+.table {
+  background:#f8f8f8;
+  width:200px;
+  border-radius: 3px;
+}
+.tableName {
+  display:inline-block;
+  width:100px;
+  padding:12px 10px 10px 10px;
+}
+.tableValue {
+  display:inline-block;
+  text-align: right;
+  padding:12px 10px 10px 10px;
+  width: 100px;
+  color: aqua;
+  background-color: #333;
+}
+
+
 //---------------------------------------------------------------------------------------
 //  stats
 //---------------------------------------------------------------------------------------
@@ -68,7 +93,7 @@ body {
     font-family: monospace;
     display:block;
     box-sizing: border-box;
-    background: #333;
+    background: rgba(#000,.5);
     color:orange;
     width:95%; 
     font-size:12px; 
@@ -138,8 +163,14 @@ body {
 //	circle
 //---------------------------------------------------------------------------------------
 
+container{
+  position:relative;
+  background:red;
+}
+
 .halo{
   //transition: .4s all;
+  -webkit-transform-style: preserve-3d;
     &.input{
     width:100px;
     height:100px;
@@ -152,85 +183,102 @@ body {
 
 @mixin rotator($color) {
   position: absolute;
-  left:43%;
-  top: 40%;
-  transform: translate3d(-50%, -50%,0);
-  border:1px solid rgba($color,.3);
-  box-shadow:
-    0 0 20px rgba($color,.1),
-    0 0 50px rgba($color,.1),
-    inset 0 0 20px rgba($color,.1),
-    inset 0 0 50px rgba($color,.1)
-    ;
+  left:50%;
+  top: 50%;
+
+  // holy glitch, batman!
+  // mix-blend-mode: screen;
+  // -webkit-filter: blur(5px);
+
+  -webkit-transform: translate3d(-50%, -50%,0) scale(1);
+  //border:1px solid rgba($color,1);
+  border:none;
+  border:10px solid rgba($color,.5);
+  // box-shadow:
+  //   0 0 20px rgba($color,.1),
+  //   0 0 50px rgba($color,.1),
+  //   inset 0 0 20px rgba($color,.1),
+  //   inset 0 0 50px rgba($color,.1)
+  //   ;
+  // box-shadow:
+  //   0 0 30px rgba($color,.3),
+  //   0 0 60px rgba($color,.3),
+  //   inset 0 0 30px rgba($color,.3),
+  //   inset 0 0 60px rgba($color,.3)
+  //   ;
+  // box-shadow:
+  //   0 0 60px rgba($color,.3),
+  //   inset 0 0 60px rgba($color,.3)
+  //   ;
   border-radius:100%;
   width: 200px;
   height: 200px;
-  -webkit-transform: scale(1);
 
-  &:before{
-    content:"";
-    position:absolute;
-    width:200px;
-    height:200px;
-    border-radius:100%;
-    border:1px solid rgba($color,.3);
-    box-shadow:
-    0 0 20px rgba($color,.1),
-    0 0 50px rgba($color,.1),
-    inset 0 0 20px rgba($color,.1),
-    inset 0 0 50px rgba($color,.1)
-    ;
-    -webkit-animation: rotate 3.5s infinite alternate-reverse;
-  }
+  // &:before{
+  //   -webkit-transform-style: preserve-3d;
+  //   content:"";
+  //   position:absolute;
+  //   width:200px;
+  //   height:200px;
+  //   border-radius:100%;
+  //   border:1px solid rgba($color,.3);
+  //   box-shadow:
+  //   0 0 20px rgba($color,.1),
+  //   0 0 50px rgba($color,.1),
+  //   inset 0 0 20px rgba($color,.1),
+  //   inset 0 0 50px rgba($color,.1)
+  //   ;
+  //   -webkit-animation: rotate 3.5s infinite alternate-reverse;
+  // }
 }
 
 .mood{
-  @include rotator(transparent);
-  box-shadow: none;
-  transition:0;
+  @include rotator(aqua);
 }
 
 .ring-1 {
-  @include rotator(aqua);
-  -webkit-animation: rotate 3.5s infinite alternate-reverse;
+  @include rotator(#FF00FF);
+  // width:180px;
+  // height:180px;
+  //-webkit-animation: rotate 3.5s infinite alternate-reverse;
 }
 .ring-2 {
   @include rotator(aqua);
-  -webkit-animation: rotate 2s infinite alternate;
+  -webkit-animation: rotate-2 4s infinite alternate;
 }
 .ring-3 {
   @include rotator(aqua);
-  -webkit-animation: rotate-2 4s infinite alternate;
+  //-webkit-animation: rotate-2 4s infinite alternate;
 }
 .ring-4 {
   @include rotator(aqua);
-  -webkit-animation: rotate 7s infinite alternate-reverse;
+  //-webkit-animation: rotate 7s infinite alternate-reverse;
 }
 .ring-5 {
   @include rotator(#FF00FF);
-  -webkit-animation: rotate-2 5s infinite alternate;
+  -webkit-animation: rotate 15s infinite alternate;
 }
 .ring-6 {
   @include rotator(aqua);
-  -webkit-animation: rotate 2s infinite alternate-reverse;
+  //-webkit-animation: rotate 2s infinite alternate-reverse;
 }
 .ring-7 {
   @include rotator(aqua);
-  -webkit-animation: rotate-2 5s infinite alternate;
+  //-webkit-animation: rotate-2 5s infinite alternate;
 }
 .ring-8 {
   @include rotator(#FF00FF);
-  -webkit-animation: rotate 10s infinite alternate-reverse;
+  -webkit-animation: rotate 3s infinite alternate-reverse;
 }
 
 
 @-webkit-keyframes rotate
 {
-  0% {-webkit-transform: rotate(360deg) scaleX(1)}
-  100% {-webkit-transform: rotate(0deg) scaleX(1.05) }
+  0% {-webkit-transform: translate3d(-50%, -50%,0) rotate(360deg) scaleX(.9)}
+  100% {-webkit-transform: translate3d(-50%, -50%,0) rotate(120deg) scaleX(1.09) }
 }
 @-webkit-keyframes rotate-2
 {
-  0% {-webkit-transform: rotate(360deg) scaleX(.9) }
-  100% {-webkit-transform: rotate(90deg) scaleX(1.05) }
+  0% {-webkit-transform: translate3d(-50%, -50%,0) rotate(360deg) scaleX(.9) }
+  100% {-webkit-transform: translate3d(-50%, -50%,0) rotate(90deg) scaleX(1.1) }
 }

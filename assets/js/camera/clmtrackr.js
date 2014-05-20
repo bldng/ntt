@@ -389,10 +389,10 @@ var clm = {
 					evt.initEvent("clmtrackrLost", true, true);
 					document.dispatchEvent(evt)
 					console.log("tracker lost");
-					localStorage.setItem("tracker",false);
+					//localStorage.setItem("tracker",false);
 					return false;
 				} else {
-					localStorage.setItem("tracker",true);
+					//localStorage.setItem("tracker",true);
 				}
 			}
 

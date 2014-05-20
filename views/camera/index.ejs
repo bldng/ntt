@@ -1,4 +1,4 @@
-<section style="width:49%; display:inline-block; position:absolute;">
+<section style=" display:inline-block; position:absolute;">
   <div>
     <h1>Values</h1>
     <button id="postMessageButton">Manual Update Test</button>
@@ -18,7 +18,7 @@
 </section>
 
 
-<section class="camera" style="width:640px; height: 100%; display:inline-block; position:absolute; right:0; background:#222; color: white;">
+<section class="camera" style="width:640px; height: 100%; display:inline-block; position:absolute; right:0; background:rgba(0,0,0,.5); color: white;">
 <h1>Camera</h1> 
 <div id="content">
   <div id="container">
@@ -110,7 +110,7 @@
             this.collection.fetch();
             //this.render();
         },
-        template: _.template("<div><p><b>{{ name }}: </b>{{ value }}</p></div>"),
+        template: _.template("<div class='table'><p><span class='tableName'>{{ name }}: </span><span class='tableValue'>{{ value }}</span></p></div>"),
         render: function () {
                 this.$el.html("");
                 this.collection.each(function(msg){
@@ -252,11 +252,11 @@
             translateY = cp[3];
             var positions = { 'translateX': Math.round(translateX), 'translateY': translateY, 'scale': scaling };
             if (scaling > 1.3 ) {
-                localStorage.setItem('positions', JSON.stringify(positions));
-                localStorage.setItem("tracker",false);
+                localStorage.setItem("tracker",true);
+                //localStorage.setItem('positions', JSON.stringify(positions));
             } else {
-                localStorage.setItem('positions', JSON.stringify(positions));
                 localStorage.setItem("tracker",false);
+                //localStorage.setItem('positions', JSON.stringify(positions));
             }
         }
         var cp = ctrack.getCurrentParameters();

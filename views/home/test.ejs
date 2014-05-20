@@ -22,18 +22,7 @@
 	<div class="content-body"></div>
 </div>
 
-<div class="halo ring-1"></div>
-<div class="halo ring-2"></div>
-<!--<div class="halo ring-3"></div>
-<div class="halo ring-4"></div>
-<div class="halo ring-5"></div>
-<div class="halo ring-6"></div>-->
-<div class="halo ring-7"></div>
-<div class="halo ring-8"></div>
-<div class="halo mood"></div>
-
-
-<div class="stats hidden">
+<div class="stats ">
 	<div class="links">
 		<a class="test one">Origin</a>
 		<a class="test two">Task</a>
@@ -43,6 +32,18 @@
 	<textarea id="speech-page-content" style="" name="pageContent" ></textarea>
 	<div style="padding-left:20px; padding-top:20px;">Result</div>
 	<textarea type="text" class="text" style=""></textarea>
+</div>
+
+<div class="container">
+<div class="halo ring-1"></div>
+<div class="halo ring-2"></div>
+<div class="halo ring-3"></div>
+<div class="halo ring-4"></div>
+<div class="halo ring-5"></div>
+<div class="halo ring-6"></div>
+<div class="halo ring-7"></div>
+<div class="halo ring-8"></div>
+<div class="halo mood"></div>
 </div>
 
 
@@ -185,6 +186,23 @@
 		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 		window.addEventListener( 'resize', onWindowResize, false );
 
+		//---------------------------------------------------------------------------------------
+		//	halo
+		//---------------------------------------------------------------------------------------
+
+		// var material = new THREE.LineBasicMaterial({
+		//     color: 0x0000ff
+		// });
+
+		// var radius = 5;
+		// var segments = 128; //<-- Increase or decrease for more resolution I guess
+
+		// var circleGeometry = new THREE.CircleGeometry( radius, segments );
+		// circleGeometry.vertices.shift();         
+		// var circle = new THREE.Line( circleGeometry, material );
+		// circle.position.z = -20;
+		// camera.add( circle );
+
 	}
 
 	function onWindowResize() {
@@ -254,42 +272,56 @@
 
 	}
 
-	var person = false;
-	returnToOrigin();
+	returnToOrigin( true );
 
-	// $(window).bind('storage', function (e) {
-	//     if (JSON.parse(localStorage.getItem('tracker')) == false) {
-	//     	setTimeout(function() {
-	//     		if (JSON.parse(localStorage.getItem('tracker')) == false) {
-	//     			returnToOrigin();
-	//     		}
-	//     	}, 10000);
-	//     } else {
-	//     	if (person !== true) {
-	//     		showTutorial();
-	//     		person = true;
-	//     	}
-	//     }
-	// });
+
+	var person = false;
+	$(window).bind('storage', function (e) {
+		if (JSON.parse(localStorage.getItem('tracker')) == false && !person) {
+		} else if (JSON.parse(localStorage.getItem('tracker')) == false && person) {
+	    	setTimeout(function() {
+	    		if (JSON.parse(localStorage.getItem('tracker')) == false) {
+	    			if ( $('.content').hasClass('hidden') == false ) {
+	    				returnToOrigin();
+	    				console.log('really lost');
+	    			}
+	    			person = false;
+	    		}
+	    	}, 5000);
+	    } else {
+	    	if (person !== true) {
+	    		showTutorial();
+	    		person = true;
+	    	}
+	    }
+	});
 
 	function showTutorial () {
-		var position = $('.halo').position();
 
-		var tween = new TWEEN.Tween(  position   )
-			.to( { top: 700 , left:0}, 500 )
-			.repeat(3)
-			.yoyo(true)
-			.easing( TWEEN.Easing.Circular.Out)
-			.onUpdate( function () {
-				$('.halo').css({top: this.top +'px', left: this.left +'px'});
-			} )
-			.start();
-		return person = true;
-		person = true;
+		happy(1);
+
+		// var position = $('.halo').position();
+
+		// var tween = new TWEEN.Tween(  position   )
+		// 	.to( { top: 700 , left:0}, 500 )
+		// 	.repeat(3)
+		// 	.yoyo(true)
+		// 	.easing( TWEEN.Easing.Circular.Out)
+		// 	.onUpdate( function () {
+		// 		$('.halo').css({top: this.top +'px', left: this.left +'px'});
+		// 	} )
+		// 	.start();
+		// return person = true;
+		// person = true;
 	}
 
-	function returnToOrigin () {
+	function returnToOrigin (instant) {
 			hideContent();
+			if (instant) {
+				size(200, 500, 0);
+			} else {
+				size(200, 3000, 500);
+			}
 			var tween = new TWEEN.Tween(camera.position).to({
 				x: 0,
 				y: 0,
@@ -347,13 +379,19 @@
 		// if (!person) {
 		// 	showTutorial();
 		// }
-		nope();
+		//nope();
+		returnToOrigin();
 	});
 
 
 
 	$(".two").click(function() {
+		if ( $('.content').hasClass('hidden') == false ) {
+			sizeTemp(400, 1400, 0);
+		}
 		hideContent();
+		//shrink(0);
+		//size(00, 400);
 
 		var random = Math.floor(Math.random() * (100-1));
 
@@ -377,8 +415,10 @@
 		    camera.lookAt(ParticleGroup.children[ random ].position);
 		}).start();
 
-		//$('.content').removeClass('hidden');
 
+		size( 500,2000,700 );
+
+		//$('.content').removeClass('hidden');
 		showContent();
 
 	});
@@ -410,9 +450,8 @@
 		//     camera.lookAt(ParticleGroup.children[ random ].position);
 		// }).start();
 
-		fogValue = oddClick ? 600 : 200;
+		fogValue = oddClick ? 300 : 200;
 		oddClick = !oddClick;
-
 
 		var tween = new TWEEN.Tween(scene.fog).to({
 		    far: fogValue
@@ -431,10 +470,16 @@
     function sentimentCheck() {
     	socket.get("/display/wit?sentence="+$('.text').val(), function (response) {
     		//console.log(	response.msg_body, response.outcome, sentence.score	);
-    		console.log(response.wit.outcome.intent, response.wit.outcome.confidence, response.sentiment.score);
-    		reaction(response.wit.outcome.intent, response.wit.outcome.confidence, response.sentiment.score);
-    		console.log(response);
-
+    		//console.log(response.wit.outcome.intent, response.wit.outcome.confidence, response.sentiment.score);
+    		reaction(
+    			response.wit.outcome.intent, 
+    			response.wit.outcome.confidence, 
+    			response.sentiment.score, 
+    			response.sentiment.comparative,
+    			response.wit.outcome.entities
+    			);
+    		// console.log(response.wit.outcome.entities);
+    		socket.put('/mood/5',{'value': response.sentiment.score });
     		// if (response.outcome.intent == 'ok' && response.outcome.confidence > 0.5) {
     		// 	$( ".two" ).trigger( "click" );
     		// }

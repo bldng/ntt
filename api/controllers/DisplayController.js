@@ -41,7 +41,8 @@ module.exports = {
 		});
 		console.log('\npositive tokens: '.green+ sentence.positive,'\nnegative tokens: '.red+sentence.negative);
        	return res.send({
-            sentiment: sentence.score
+            sentiment: sentence.score,
+            comparative: sentence.comparative
         })
 	},
 	ask2: function(req, res) {
@@ -54,15 +55,53 @@ module.exports = {
 		     sentiment: result
 		 })
 	},
+	wolfram: function(req, res) {
+
+		var Client = require('node-wolfram');
+		var Wolfram = new Client('246XH8-K98WKX6TWL');
+		var searchFor = req.query.sentence;
+
+		var input;
+		var output;
+
+		Wolfram.query( searchFor , function(err, result) {
+		    if(err) {
+		        console.log(err);
+		        	return res.send({
+		        			input: input.subpod[0].plaintext.toString(),
+		        			output: 'no results.'
+		        	 })
+		    }
+		    else {
+		    	input = result.queryresult.pod[0];
+		    	output = result.queryresult.pod[1];
+
+		    	return res.send({
+		    			input: input.subpod[0].plaintext.toString(),
+		    			output: output.subpod[0].plaintext.toString()
+		    	 })
+		    }
+		});
+	},
 	wit: function(req, res) {
 		var user_text = req.query.sentence;
 		var sentence = sentiment(req.query.sentence, {	// analyse sentence
 		    'you': 10,
 		    'love': 10,
 		    'how are you': 10,
-		    'please': 10,
-		    'thank you': 10,
-		    'thanks': 10
+		    'please': 5,
+		    'thank you': 25,
+		    'entity': 5,
+		    'thanks': 25,
+		    'suck': -20,
+		    'f': -20,
+		    'stupid': -10,
+		    's': -10,
+		    'c': -20,
+		    'a': -15,
+		    'd': -15,
+		    'sorry': 25,
+		    'i like you': 25,
 		});
 		var future = Future.create();
 	    var options = {
@@ -139,7 +178,7 @@ module.exports = {
 
 		    	          // The item was found successfully!
 		    	          } else {
-		    	            item.value = parseInt(item.value) + 1;
+		    	            item.value = parseInt(item.value) + 1; // add sentiment to news total
 		    	              item.save(function (err) {
 		    	                if (err) return res.send(err,500);
 		    	                // Report back with the new state of the item
@@ -150,26 +189,29 @@ module.exports = {
 		    	          }
 		    	        });
 
-		    	        // fs.writeFile(today, JSON.stringify({
-		    	        // 	numberwang: analysed.score,
-		    	        //     'analysed articles': articles,
-		    	        //     date: date,
-		    	        //     'positive words total': analysed.positive.length,
-		    	        //     'negative words total': analysed.negative.length,
-		    	        //     positive: analysed.positive,
-		    	        //     negative: analysed.negative,
-		    	        //     body: responseFull
+		    	        fs.writeFile(today, JSON.stringify({
+		    	        	numberwang: analysed.score,
+		    	        	comparative: analysed.comparative,
+		    	            'analysed articles': articles,
+		    	            date: date,
+		    	            'positive words total': analysed.positive.length,
+		    	            'negative words total': analysed.negative.length
+		    	            // ,
+		    	            // positive: analysed.positive,
+		    	            // negative: analysed.negative,
+		    	            // body: responseFull
 
-		    	        // }), function(err) {
-		    	        //     if(err) {
-		    	        //         console.log(err);
-		    	        //     } else {
-		    	        //         console.log(today +" was saved.");
-		    	        //     }
-		    	        // });
+		    	        }), function(err) {
+		    	            if(err) {
+		    	                console.log(err);
+		    	            } else {
+		    	                console.log(today +" was saved.");
+		    	            }
+		    	        });
 
 		    	        return res.send({
 		    	             numberwang: analysed.score,
+		    	             comparative: analysed.comparative,
 		    	             'analysed articles': articles,
 		    	             'positive words total': analysed.positive.length,
 		    	             'negative words total': analysed.negative.length,
@@ -182,36 +224,53 @@ module.exports = {
 		    	});
 		    }
 		});
-		date = '';
+		//date = '';
 	},
 
 	newsRatio: function(req,res) {
 
 		var dir = "./logs/news/";
-		var data={};
-		var myfiles = [];
-		var foo = [];
-		var temp;
 
-		fs.readdir( dir , function (err, files) { if (err) throw err;
-		  files.forEach( function (file) {
-		  	if (file !== ".DS_Store") {
-		  		fs.readFileSync("./logs/news/"+file, 'utf-8',  function(err,content){
-					if (err) throw err;
-					data[file]=JSON.parse(content);
-					temp = JSON.parse(content);
-					//foo.push( JSON.parse(content) ); //socket.emit('init', {data: data});
-					foo.push(temp.numberwang, temp['analysed articles'] );
-				});
-				//myfiles.push(data);
-				console.log(foo);
-		  	}  
-		  });
-		  console.log(foo);
+		fs.readdir( dir, function( err, files) {
+		    if ( err ) {
+		        console.log("Error reading files: ", err);
+		    } else {
+		        // keep track of how many we have to go.
+
+		        files.splice(files.indexOf('.DS_Store'), 1); // .DS_Store go home, you're drunk
+
+		        var remaining = files.length;
+		        var totalBytes = 0;
+		        var sentimentScore = 0;
+
+		        if ( remaining == 0 ) {
+		            console.log("Done reading files. totalBytes: " +
+		                totalBytes);
+		        }
+
+		        // for each file,
+		        for ( var i = 0; i < files.length; i++ ) {
+		            // read its contents.
+		            fs.readFile( dir+files[i], 'utf-8',  function( error, data ) {
+		                if ( error ) {
+		                    console.log("Error: ", error);
+		                } else {
+		                    totalBytes += data.length
+		                    sentimentScore += JSON.parse(data).comparative;
+		                    console.log(JSON.parse(data).comparative);
+		                    console.log("Successfully read a file.");
+		                }
+		                remaining -= 1;
+		                if ( remaining == 0 ) {
+		                    console.log("Done reading files... totalBytes: " +
+		                        totalBytes, sentimentScore ,sentimentScore / files.length);
+		                }
+		            });
+		        }
+		    }
 		});
-		return res.send({
-		     numberwang: 'wat',
-		 })
+		
+
 	},
 
 	// ask: function(req, res) {

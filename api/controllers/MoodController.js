@@ -35,6 +35,20 @@ module.exports = {
 		});
 	},
 
+	sentimentCalc: function (req,res) {
+		Mood.findOne(req.param('id')).done(function(err, item) {
+		  if (err) {
+		    return console.log(err);
+		  } else {
+		    item.value = parseInt(item.value) + 1;
+		      item.save(function (err) {
+		        if (err) return res.send(err,500);
+		        res.json(item);
+		      });
+		  }
+		});
+	},
+
 	ratio: function (req,res) {
 		Mood.find().done(function(err, collection) {
 
