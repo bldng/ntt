@@ -140,6 +140,7 @@ module.exports = {
 		var date = new Date();
 
 		var today = "./logs/news/"+date.toISOString().replace(/\T.+/, '')+".json";
+		console.log(today);
 
 		fs.exists(today, function(exists) {
 		    if (exists) {
@@ -272,6 +273,34 @@ module.exports = {
 		});
 		
 
+	},
+
+	how: function(req, res) {
+
+		var date = new Date();
+		var today = "./logs/news/"+date.toISOString().replace(/\T.+/, '')+".json";
+
+		fs.exists(today, function(exists) {
+		    if (exists) {
+		        console.log('value for today exists');
+
+		        Mood.findOne(4).done(function(err, item) {
+		    	          // Error handling
+		    	          if (err) {
+		    	            return console.log(err);
+
+		    	          // The item was found successfully!
+		    	          } else {
+		    	          	return res.send({
+		     					sentiment: item.value
+		 					})
+
+		    	          }
+		    	        });
+		    } else {
+				console.log('triggering /news');
+		    }
+		})
 	},
 
 	// ask: function(req, res) {
