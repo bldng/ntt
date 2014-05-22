@@ -65,7 +65,7 @@ module.exports = {
 		var output;
 
 		Wolfram.query( searchFor , function(err, result) {
-		    if(err) {
+		    if(err || result.queryresult.$.success == "false") {
 		        console.log(err);
 		        	return res.send({
 		        			input: req.query.sentence,
@@ -73,6 +73,7 @@ module.exports = {
 		        	 })
 		    }
 		    else {
+
 		    	input = result.queryresult.pod[0];
 		    	output = result.queryresult.pod[1];
 

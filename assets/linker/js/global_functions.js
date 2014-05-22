@@ -47,9 +47,9 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 
 				case "wolfram":
 
-					var sentiment_minimum = 0;
+					var sentiment_minimum = -10;
 					console.log(sentiment, body.wolfram_search_query.value);
-					if (sentiment >= sentiment_minimum) {
+					if (sentiment >= sentiment_minimum && confidence > 0.7) {
 						$( ".two" ).trigger( "click" );
 						$('.content').removeClass('hidden');
 
