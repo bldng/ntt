@@ -68,7 +68,7 @@ module.exports = {
 		    if(err) {
 		        console.log(err);
 		        	return res.send({
-		        			input: input.subpod[0].plaintext.toString(),
+		        			input: req.query.sentence,
 		        			output: 'no results.'
 		        	 })
 		    }
