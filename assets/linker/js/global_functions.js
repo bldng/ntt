@@ -26,10 +26,64 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 						returnToOrigin();
 						happy(1);
 					} else {
-						$( ".two" ).trigger( "click" );
+						//$( ".two" ).trigger( "click" );
 					}
 					break;
 
+
+				//---------------------------------------------------------------------------------------
+				//	Do you like? 
+				//---------------------------------------------------------------------------------------
+
+
+				case "do_you_like":
+
+					function checkColors(item) {
+						var image = item;
+						var colors = RGBaster.colors(image, function(payload){
+						  console.log(payload.dominant);
+						});
+					}
+
+					$('.content-body').html('');
+
+					socket.get("/display/bing?sentence="+body.message_body.body, function (response) {
+						for (var i = response.length - 1; i >= 0; i--) {
+							console.log(response[i]);
+						};
+
+						$('.content-body').html("<div class='big'><ul class='imageList'></ul></div>");
+						$('.content').removeClass('hidden');
+
+						var cList = $('ul.imageList')
+						d = new Date();
+						$.each(response, function(i)
+						{
+						    var li = $('<li/>')
+						        .addClass('ui-menu-item')
+						        .appendTo(cList);
+						    var aaa = $('<img/>')
+						        .addClass('ui-all')
+						        .attr('id','image-'+i)
+						        .attr("src",response[i]+"?"+d.getTime())
+						        .appendTo(li);
+
+						        checkColors(response[i]);
+						});
+
+					// 	function checkColors(item) {
+					// 		var image = item;//$('#image-'+item);
+
+					// 		var colors = RGBaster.colors(image, function(payload){
+					// 		  // console.log(payload.dominant);
+					// 		  // console.log(payload.palette);
+					// 		  console.log("------------------------------------------------");
+					// 		});
+					// 	}
+
+					 });
+
+					break;
 
 				//---------------------------------------------------------------------------------------
 				//	Go back to start position / abort

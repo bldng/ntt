@@ -32,12 +32,22 @@ module.exports = {
 	},
 	ask: function(req, res) {
 		var sentence = sentiment(req.query.sentence, {	// analyse sentence
-		    'you': 10,
-		    'love': 10,
-		    'how are you': 10,
-		    'please': 10,
-		    'thank you': 10,
-		    'thanks': 10
+			'you': 10,
+			'love': 10,
+			'how are you': 15,
+			'please': 5,
+			'thank you': 25,
+			'entity': 5,
+			'thanks': 25,
+			'suck': -20,
+			'f': -20,
+			'stupid': -10,
+			's': -10,
+			'c': -20,
+			'a': -15,
+			'd': -15,
+			'sorry': 25,
+			'i like you': 25,
 		});
 		console.log('\npositive tokens: '.green+ sentence.positive,'\nnegative tokens: '.red+sentence.negative);
        	return res.send({
@@ -54,6 +64,60 @@ module.exports = {
 		return res.send({
 		     sentiment: result
 		 })
+	},
+	bing: function(req,res) {
+
+		var https = require('https');
+		var qs = require('querystring');
+		var request = require('request');
+
+		var s = req.query.sentence;
+
+		var result = {success:false};
+		//console.log("Bing Search for "+s);
+		var options = {
+			hostname:"api.datamarket.azure.com",
+			path:"/Bing/Search/Image?Query=%27" + qs.escape(s) + "%27&Adult=%27strict%27&$top=5&$format=json",
+			method:"GET",
+			auth:":LajDpVk8HkYOqRSOzr/B1eVrHNEndCSZRAYBHpJbbI8",
+			rejectUnauthorized:false
+		}
+
+		https.get(options, function(response) {
+			console.log("Got response: " +response.statusCode.green);
+			var body = "";
+
+			response.on('data', function (chunk) {
+				body += chunk;
+			});
+
+			response.on('end', function() {
+				result.success = true;
+				var data = JSON.parse(body);
+				result.data = data.d.results;
+
+				var imageURLs = [];
+
+				for (var __metadata in result.data) {
+
+					request(result.data[__metadata].MediaUrl).pipe(fs.createWriteStream('assets/images/img-temp/doodle'+__metadata+'.jpg'))
+
+					//--------
+				   console.log(__metadata + ": " + result.data[__metadata].MediaUrl);
+				   //imageURLs.push(result.data[__metadata].MediaUrl);
+				   imageURLs.push('https://localhost:1337/images/img-temp/doodle'+__metadata+'.jpg');
+				}
+
+				return res.send(imageURLs)
+			});
+
+		}).on('error', function(e) {
+			console.log("Got error: " + e.message);
+			//cb(result);
+		});
+
+		
+
 	},
 	wolfram: function(req, res) {
 
