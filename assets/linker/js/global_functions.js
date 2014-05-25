@@ -3,10 +3,10 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 	if (sentiment >= 0){
 		if (confidence > 0.5) {
 			switch (intent)
-			{	
+			{   
 
 				//---------------------------------------------------------------------------------------
-				//	hello!
+				//  hello!
 				//---------------------------------------------------------------------------------------
 
 				case "Hey_there":
@@ -17,7 +17,7 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 					break;
 
 				//---------------------------------------------------------------------------------------
-				//	Go to display
+				//  Go to display
 				//---------------------------------------------------------------------------------------
 
 
@@ -32,61 +32,68 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 
 
 				//---------------------------------------------------------------------------------------
-				//	Do you like? 
+				//  Do you like? 
 				//---------------------------------------------------------------------------------------
 
 
 				case "do_you_like":
 
-					function checkColors(item) {
-						var image = item;
-						var colors = RGBaster.colors(image, function(payload){
-						  console.log(payload.dominant);
-						});
-					}
-
-					$('.content-body').html('');
-
 					socket.get("/display/bing?sentence="+body.message_body.body, function (response) {
-						for (var i = response.length - 1; i >= 0; i--) {
+
+						console.log(response);
+
+						$.each(response, function(i) { 
 							console.log(response[i]);
-						};
-
-						$('.content-body').html("<div class='big'><ul class='imageList'></ul></div>");
-						$('.content').removeClass('hidden');
-
-						var cList = $('ul.imageList')
-						d = new Date();
-						$.each(response, function(i)
-						{
-						    var li = $('<li/>')
-						        .addClass('ui-menu-item')
-						        .appendTo(cList);
-						    var aaa = $('<img/>')
-						        .addClass('ui-all')
-						        .attr('id','image-'+i)
-						        .attr("src",response[i]+"?"+d.getTime())
-						        .appendTo(li);
-
-						        checkColors(response[i]);
 						});
 
-					// 	function checkColors(item) {
-					// 		var image = item;//$('#image-'+item);
+						$( ".two" ).trigger( "click" );
+						$('.content').removeClass('hidden');
+						$('.content-body').html("<div class='like-color'>&nbsp;</div>");
 
-					// 		var colors = RGBaster.colors(image, function(payload){
-					// 		  // console.log(payload.dominant);
-					// 		  // console.log(payload.palette);
-					// 		  console.log("------------------------------------------------");
-					// 		});
-					// 	}
+						//$(".ring-8").velocity({ borderColorRed: '13', borderColorGreen: '19', borderColorBlue: '20'},  200, "swing").{ loop: 2 }
+						$(".like-color")
+						.velocity({ backgroundColorRed: response[0].slice(2,3), backgroundColorGreen: response[0].slice(1,3), backgroundColorBlue: response[0].slice(1,2)},{delay: 1000} 300, "swing")
+						.velocity({ backgroundColorRed: response[1].slice(2,3), backgroundColorGreen: response[1].slice(1,3), backgroundColorBlue: response[1].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[2].slice(2,3), backgroundColorGreen: response[2].slice(1,3), backgroundColorBlue: response[2].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[3].slice(2,3), backgroundColorGreen: response[3].slice(1,3), backgroundColorBlue: response[3].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[4].slice(2,3), backgroundColorGreen: response[4].slice(1,3), backgroundColorBlue: response[4].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[0].slice(2,3), backgroundColorGreen: response[0].slice(1,3), backgroundColorBlue: response[0].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[1].slice(2,3), backgroundColorGreen: response[1].slice(1,3), backgroundColorBlue: response[1].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[2].slice(2,3), backgroundColorGreen: response[2].slice(1,3), backgroundColorBlue: response[2].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[3].slice(2,3), backgroundColorGreen: response[3].slice(1,3), backgroundColorBlue: response[3].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[4].slice(2,3), backgroundColorGreen: response[4].slice(1,3), backgroundColorBlue: response[4].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[0].slice(2,3), backgroundColorGreen: response[0].slice(1,3), backgroundColorBlue: response[0].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[1].slice(2,3), backgroundColorGreen: response[1].slice(1,3), backgroundColorBlue: response[1].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[2].slice(2,3), backgroundColorGreen: response[2].slice(1,3), backgroundColorBlue: response[2].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[3].slice(2,3), backgroundColorGreen: response[3].slice(1,3), backgroundColorBlue: response[3].slice(1,2)}, 300, "swing")
+						.velocity({ backgroundColorRed: response[4].slice(2,3), backgroundColorGreen: response[4].slice(1,3), backgroundColorBlue: response[4].slice(1,2)},{ 
+						    complete: function(elements) { returnToOrigin(); }
+						} ,300, "swing")
+						;
 
-					 });
+						// $('.content-body').html("<div class='big'><ul class='imageList'></ul></div>");
+
+						// var cList = $('ul.imageList');
+						// d = new Date();
+
+						// $.each(response, function(i) {
+						//     var li = $('<li/>')
+						//         .addClass('ui-menu-item')
+						//         .css({'border':'10px solid rgb(155,100,63)' })
+						//         .appendTo(cList);
+						//     var aaa = $('<img/>')
+						//         .addClass('ui-all')
+						//         .attr('id','image-'+i)
+						//         .attr("src",response[i]+"?"+d.getTime())
+						//         .appendTo(li);
+						//   });
+
+					});
 
 					break;
 
 				//---------------------------------------------------------------------------------------
-				//	Go back to start position / abort
+				//  Go back to start position / abort
 				//---------------------------------------------------------------------------------------
 
 
@@ -95,7 +102,7 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 					break;
 
 				//---------------------------------------------------------------------------------------
-				//	Wolfram alpha search
+				//  Wolfram alpha search
 				//---------------------------------------------------------------------------------------
 
 
@@ -118,7 +125,7 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 					break;
 
 				//---------------------------------------------------------------------------------------
-				//	...
+				//  ...
 				//---------------------------------------------------------------------------------------
 
 
@@ -129,13 +136,13 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 						$( ".two" ).trigger( "click" );
 						$('.content').removeClass('hidden');
 						$('.content-body').text(time);
-						    var today=new Date();
-						    var h=today.getHours();
-						    var m=today.getMinutes();
-						    var s=today.getSeconds();
-						    var n = today.toLocaleDateString();
-						    //document.getElementById('txt').innerHTML = h+":"+m+":"+s;
-						    $('.content-body').html("<div class='big'>"+h+":"+m+":"+s+"<div><br>"+n);
+							var today=new Date();
+							var h=today.getHours();
+							var m=today.getMinutes();
+							var s=today.getSeconds();
+							var n = today.toLocaleDateString();
+							//document.getElementById('txt').innerHTML = h+":"+m+":"+s;
+							$('.content-body').html("<div class='big'>"+h+":"+m+":"+s+"<div><br>"+n);
 					} else {
 						nope(sentiment);
 					}
@@ -161,7 +168,7 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 }
 
 //---------------------------------------------------------------------------------------
-//	animation stuff
+//  animation stuff
 //---------------------------------------------------------------------------------------
 
 
@@ -172,20 +179,20 @@ function nope(sentiment) {
 	sizeTemp(150, duration * 10, 0);
 
 	var tween = new TWEEN.Tween( { x: 0, y:1 } )
-	            .to( { x: sentiment, y:0.5 }, duration )
-	        	.repeat(1)
-	        	.yoyo(true)
-	            .easing( TWEEN.Easing.Quadratic.InOut )
-	            .onUpdate( function () {
-	                $('.mood').css({
-	                	'box-shadow': 
-	                	'inset 0 0 0' + this.x + 'px tomato, inset 0 0 0' + this.x*.5 + 'px red, 0 0 0' + this.x*.8 + 'px tomato, 0 0 0' + this.x*2 + 'px red'}
-	                	);
-	                //$('.halo').css({'-webkit-transform':'scale('+this.y+')'});
+				.to( { x: sentiment, y:0.5 }, duration )
+				.repeat(1)
+				.yoyo(true)
+				.easing( TWEEN.Easing.Quadratic.InOut )
+				.onUpdate( function () {
+					$('.mood').css({
+						'box-shadow': 
+						'inset 0 0 0' + this.x + 'px tomato, inset 0 0 0' + this.x*.5 + 'px red, 0 0 0' + this.x*.8 + 'px tomato, 0 0 0' + this.x*2 + 'px red'}
+						);
+					//$('.halo').css({'-webkit-transform':'scale('+this.y+')'});
 
-	            } )
-	            .start();
-	            console.log(sentiment);
+				} )
+				.start();
+				console.log(sentiment);
 }
 
 function wat2(sentiment) {
@@ -241,5 +248,5 @@ function sizeTemp (size, duration, delay) {
 
 
 // function show_time (argument) {
-// 	// body...
+//  // body...
 // }

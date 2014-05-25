@@ -65,6 +65,11 @@ module.exports = {
 		     sentiment: result
 		 })
 	},
+
+	//---------------------------------------------------------------------------------------
+	//	search images, get dominant colors
+	//---------------------------------------------------------------------------------------
+
 	bing: function(req,res) {
 
 		var https = require('https');
@@ -77,11 +82,12 @@ module.exports = {
 		//console.log("Bing Search for "+s);
 		var options = {
 			hostname:"api.datamarket.azure.com",
-			path:"/Bing/Search/Image?Query=%27" + qs.escape(s) + "%27&Adult=%27strict%27&$top=5&$format=json",
+			path:"/Bing/Search/Image?ImageFilters=%27Size%3AMedium%27&Query=%27" + qs.escape(s) + "%27&Adult=%27strict%27&$top=5&$format=json",
 			method:"GET",
 			auth:":LajDpVk8HkYOqRSOzr/B1eVrHNEndCSZRAYBHpJbbI8",
 			rejectUnauthorized:false
 		}
+
 
 		https.get(options, function(response) {
 			console.log("Got response: " +response.statusCode.green);
@@ -99,17 +105,60 @@ module.exports = {
 				var imageURLs = [];
 
 				for (var __metadata in result.data) {
-
-					request(result.data[__metadata].MediaUrl).pipe(fs.createWriteStream('assets/images/img-temp/doodle'+__metadata+'.jpg'))
-
-					//--------
-				   console.log(__metadata + ": " + result.data[__metadata].MediaUrl);
-				   //imageURLs.push(result.data[__metadata].MediaUrl);
-				   imageURLs.push('https://localhost:1337/images/img-temp/doodle'+__metadata+'.jpg');
+				   imageURLs.push(result.data[__metadata].MediaUrl);
 				}
 
-				return res.send(imageURLs)
-			});
+				var EMBEDLY_KEY = '3d29e3a35cee465ebb9fb8f35771349f';
+
+				var embedly = require('embedly'),
+				    util = require('util');
+
+				var colors = [];
+
+				new embedly({key: EMBEDLY_KEY}, function(err, api) {
+				  if (!!err) {
+				    console.error('Error creating Embedly api');
+				    console.error(err.stack, api);
+				    return;
+				  }
+
+				  var opts = { urls: imageURLs,
+				           };
+
+					  api.extract(opts, function(err, objs) {
+					      if (!!err) {
+					        console.error('request failed');
+					        console.error(err.stack, objs);
+					        return;
+					      }
+
+					      for (var images in objs) {
+					         //console.log(objs[images].images[0].colors[0].color);
+					         colors.push(objs[images].images[0].colors[0].color);
+					      }
+
+					      return res.send(colors)
+					      // console.log('-------------------------------------------------------');
+					      // console.log(util.inspect(objs));
+					  });
+				  });
+				});
+
+
+				// var imageURLs = [];
+
+				// for (var __metadata in result.data) {
+
+				// 	request(result.data[__metadata].MediaUrl).pipe(fs.createWriteStream('assets/images/img-temp/doodle'+__metadata+'.jpg'))
+
+				// 	//--------
+				//    console.log(__metadata + ": " + result.data[__metadata].MediaUrl);
+				//    //imageURLs.push(result.data[__metadata].MediaUrl);
+				//    imageURLs.push('/images/img-temp/doodle'+__metadata+'.jpg');
+				// }
+
+				//return res.send(imageURLs)
+			//});
 
 		}).on('error', function(e) {
 			console.log("Got error: " + e.message);

@@ -17,7 +17,6 @@
 <script src="/js/display/three.min.js"></script>
 <script src="/js/display/Tween.js"></script>
 <script src="/js/display/velocity.js"></script>
-<script src="/js/display/rgbaster.min.js"></script>
 
 <div class="content hidden">
 	<div class="content-body"></div>
@@ -346,7 +345,7 @@
 	function hideContent (argument) {
 		$(".content").addClass('hidden');
 		$(".content-body").velocity({ 
-		    opacity: 0,
+		    //opacity: 0,
 		},{
 			duration: 100
 		});
@@ -503,7 +502,7 @@
     recognition.interimResults = true;
     recognition.lang = "en_US";
     //serviceURI = "https://www.google.com/speech-api/v1/recognize?xjerr=1&pfilter=0&client=chromium&lang=en-US",
-    //recognition.start();
+    recognition.start();
 
     recognition.onresult = function (event) {
         for (var i = event.resultIndex; i < event.results.length; ++i) {
