@@ -82,7 +82,7 @@ module.exports = {
 		//console.log("Bing Search for "+s);
 		var options = {
 			hostname:"api.datamarket.azure.com",
-			path:"/Bing/Search/Image?ImageFilters=%27Size%3AMedium%27&Query=%27" + qs.escape(s) + "%27&Adult=%27strict%27&$top=5&$format=json",
+			path:"/Bing/Search/Image?ImageFilters=%27Size%3AMedium%27&Query=%27" + qs.escape(s) + "%27&Adult=%27strict%27&$top=15&$format=json",
 			method:"GET",
 			auth:":LajDpVk8HkYOqRSOzr/B1eVrHNEndCSZRAYBHpJbbI8",
 			rejectUnauthorized:false
@@ -134,10 +134,15 @@ module.exports = {
 
 					      for (var images in objs) {
 					         //console.log(objs[images].images[0].colors[0].color);
-					         colors.push(objs[images].images[0].colors[0].color);
+					         if ( objs[images].images[0] !== undefined ){
+					        	 colors.push(objs[images].images[0].colors[0].color);
+					     	}
 					      }
 
-					      return res.send(colors)
+					      return res.send({
+					      	colors: colors,
+					      	images: imageURLs
+					      })
 					      // console.log('-------------------------------------------------------');
 					      // console.log(util.inspect(objs));
 					  });

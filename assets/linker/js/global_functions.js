@@ -1,3 +1,5 @@
+var imageScraper;
+
 function reaction (intent,confidence,sentiment,comparative,body) {
 	console.log(intent, confidence, sentiment);
 	if (sentiment >= 0){
@@ -40,36 +42,44 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 
 					socket.get("/display/bing?sentence="+body.message_body.body, function (response) {
 
-						console.log(response);
+						// console.log(response);
 
-						$.each(response, function(i) { 
-							console.log(response[i]);
-						});
+						// $.each(response, function(i) { 
+						// 	console.log(response[i]);
+						// });
 
 						$( ".two" ).trigger( "click" );
 						$('.content').removeClass('hidden');
-						$('.content-body').html("<div class='like-color'>&nbsp;</div>");
+						$('.content-body').html("<div class='like-color'><ul class='imageList'></ul></div>");
 
-						//$(".ring-8").velocity({ borderColorRed: '13', borderColorGreen: '19', borderColorBlue: '20'},  200, "swing").{ loop: 2 }
-						$(".like-color")
-						.velocity({ backgroundColorRed: response[0].slice(2,3), backgroundColorGreen: response[0].slice(1,3), backgroundColorBlue: response[0].slice(1,2)},{delay: 1000} 300, "swing")
-						.velocity({ backgroundColorRed: response[1].slice(2,3), backgroundColorGreen: response[1].slice(1,3), backgroundColorBlue: response[1].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[2].slice(2,3), backgroundColorGreen: response[2].slice(1,3), backgroundColorBlue: response[2].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[3].slice(2,3), backgroundColorGreen: response[3].slice(1,3), backgroundColorBlue: response[3].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[4].slice(2,3), backgroundColorGreen: response[4].slice(1,3), backgroundColorBlue: response[4].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[0].slice(2,3), backgroundColorGreen: response[0].slice(1,3), backgroundColorBlue: response[0].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[1].slice(2,3), backgroundColorGreen: response[1].slice(1,3), backgroundColorBlue: response[1].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[2].slice(2,3), backgroundColorGreen: response[2].slice(1,3), backgroundColorBlue: response[2].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[3].slice(2,3), backgroundColorGreen: response[3].slice(1,3), backgroundColorBlue: response[3].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[4].slice(2,3), backgroundColorGreen: response[4].slice(1,3), backgroundColorBlue: response[4].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[0].slice(2,3), backgroundColorGreen: response[0].slice(1,3), backgroundColorBlue: response[0].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[1].slice(2,3), backgroundColorGreen: response[1].slice(1,3), backgroundColorBlue: response[1].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[2].slice(2,3), backgroundColorGreen: response[2].slice(1,3), backgroundColorBlue: response[2].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[3].slice(2,3), backgroundColorGreen: response[3].slice(1,3), backgroundColorBlue: response[3].slice(1,2)}, 300, "swing")
-						.velocity({ backgroundColorRed: response[4].slice(2,3), backgroundColorGreen: response[4].slice(1,3), backgroundColorBlue: response[4].slice(1,2)},{ 
-						    complete: function(elements) { returnToOrigin(); }
-						} ,300, "swing")
-						;
+						var cList = $('ul.imageList');
+
+						$.each(response.images, function(i) {
+							var li = $('<li/>')
+							    .addClass('ui-menu-item')
+							    .css({'background':'url('+response.images[i]+')'})
+							    .appendTo(cList);
+						});
+
+						$(".imageList > li:gt(0)").hide();
+
+
+
+						imageScraper = setInterval(function(){flicker()}, 100);
+
+						function flicker() {
+							$('.imageList > li:first')
+							  .fadeOut(10)
+							  .next()
+							  .fadeIn(10)
+							  .end()
+							  .appendTo('.imageList');
+							  console.log('bla');
+						}
+
+
+
+
 
 						// $('.content-body').html("<div class='big'><ul class='imageList'></ul></div>");
 
@@ -98,6 +108,7 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 
 
 				case "close":
+					myStopFunction();
 					returnToOrigin();
 					break;
 
@@ -170,6 +181,11 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 //---------------------------------------------------------------------------------------
 //  animation stuff
 //---------------------------------------------------------------------------------------
+
+
+function myStopFunction() {
+    clearInterval(imageScraper);
+}
 
 
 function nope(sentiment) {
