@@ -42,11 +42,26 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 
 					socket.get("/display/bing?sentence="+body.message_body.body, function (response) {
 
-						// console.log(response);
-
 						// $.each(response, function(i) { 
 						// 	console.log(response[i]);
 						// });
+						
+						tempColorArray = [];
+
+						$.each(response.colors, function(i) { 
+							//console.log( this[2] );
+							tempColorArray.push(this[2]);
+						});
+
+						console.log(  tempColorArray  );
+
+						var sum = tempColorArray.reduce(function(pv, cv) { return pv + cv; }, 0);
+
+						var colorThreshold = sum / response.colors.length;
+
+
+
+
 
 						$( ".two" ).trigger( "click" );
 						$('.content').removeClass('hidden');
@@ -74,8 +89,21 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 							  .fadeIn(10)
 							  .end()
 							  .appendTo('.imageList');
-							  console.log('bla');
 						}
+
+						setTimeout(function() {
+							myStopFunction();
+							returnToOrigin();
+							if (  imageScraper <= 125  ){
+								happy(1);
+							} else {
+								//nope();
+								$(".halo")		
+								.velocity({ marginLeft: '-=200'}, { duration: 200, easing: "easeOutCirc"})
+								.velocity({ marginLeft: '+=400'}, { duration: 200, easing: "easeOutCirc"})
+								.velocity({ marginLeft: '-=200'}, { duration: 300, easing: "easeOutCirc"});
+							}
+						}, 6000);
 
 
 
@@ -185,6 +213,10 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 
 function myStopFunction() {
     clearInterval(imageScraper);
+}
+
+function doNotWant() {
+	$(".halo").velocity({ marginTop: -200, width: '+=25', height: '+=25'}, { duration: 700, loop:1, easing: "easeInOutBack"});
 }
 
 
