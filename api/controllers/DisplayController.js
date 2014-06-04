@@ -262,8 +262,21 @@ module.exports = {
 
 		fs.exists(today, function(exists) {
 		    if (exists) {
-		        console.log('file already exists');
-		        return res.send('file exists ...')
+		        console.log('file already exists, sending output...');
+
+		        fs.readFile( today, 'utf-8',  function( error, data ) {
+		            if ( error ) {
+		                console.log("Error: ", error);
+		            } else {
+		                return res.send({
+		                	sentiment: JSON.parse(data).numberwang,
+		                	comparative: JSON.parse(data).comparative
+		                })
+		            	}
+		            });
+
+
+		        //return res.send('file exists ...')
 		    } else {
 		    	var url = "http://content.guardianapis.com/search?section=world&page-size=50&order-by=relevance&show-fields=body&date-id=date%2Fyesterday&show-redistributable-only=body&api-key=mhe363khxt4dbm85vpewe2ev"
 		    	http.get(url, function(response) {

@@ -40,75 +40,91 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 
 				case "do_you_like":
 
-					socket.get("/display/bing?sentence="+body.message_body.body, function (response) {
+					if (body.message_body.body == "humans" ) {
 
-						// $.each(response, function(i) { 
-						// 	console.log(response[i]);
-						// });
-						
-						tempColorArray = [];
-
-						$.each(response.colors, function(i) { 
-							//console.log( this[2] );
-							tempColorArray.push(this[2]);
+						socket.get('/mood/ratio', function (data) {
+						    console.log(data.percentage);
+						    if (data.percentage > 50) {
+						    	happy(1);
+						    } else {
+						    	$(".halo")		
+						    	.velocity({ marginLeft: '-=200'}, { duration: 200, easing: "easeOutCirc"})
+						    	.velocity({ marginLeft: '+=400'}, { duration: 200, easing: "easeOutCirc"})
+						    	.velocity({ marginLeft: '-=200'}, { duration: 300, easing: "easeOutCirc"});
+						    }
 						});
 
-						console.log(  tempColorArray  );
+						console.log('someone asked for humans?');
 
-						var sum = tempColorArray.reduce(function(pv, cv) { return pv + cv; }, 0);
+					} else {
 
-						var colorThreshold = sum / response.colors.length;
+						socket.get("/display/bing?sentence="+body.message_body.body, function (response) {
 
+							// $.each(response, function(i) { 
+							// 	console.log(response[i]);
+							// });
+							
+							tempColorArray = [];
 
+							$.each(response.colors, function(i) { 
+								//console.log( this[2] );
+								tempColorArray.push(this[2]);
+							});
 
+							console.log(  tempColorArray  );
 
+							var sum = tempColorArray.reduce(function(pv, cv) { return pv + cv; }, 0);
 
-						$( ".two" ).trigger( "click" );
-						$('.content').removeClass('hidden');
-						$('.content-body').html("<div class='like-color'><ul class='imageList'></ul></div>");
-
-						var cList = $('ul.imageList');
-
-						$.each(response.images, function(i) {
-							var li = $('<li/>')
-							    .addClass('ui-menu-item')
-							    .css({'background':'url('+response.images[i]+')'})
-							    .appendTo(cList);
-						});
-
-						$(".imageList > li:gt(0)").hide();
+							var colorThreshold = sum / response.colors.length;
 
 
 
-						imageScraper = setInterval(function(){flicker()}, 100);
 
-						function flicker() {
-							$('.imageList > li:first')
-							  .fadeOut(10)
-							  .next()
-							  .fadeIn(10)
-							  .end()
-							  .appendTo('.imageList');
-						}
 
-						setTimeout(function() {
-							myStopFunction();
-							returnToOrigin();
-							if (  imageScraper <= 125  ){
-								happy(1);
-							} else {
-								//nope();
-								$(".halo")		
-								.velocity({ marginLeft: '-=200'}, { duration: 200, easing: "easeOutCirc"})
-								.velocity({ marginLeft: '+=400'}, { duration: 200, easing: "easeOutCirc"})
-								.velocity({ marginLeft: '-=200'}, { duration: 300, easing: "easeOutCirc"});
+							$( ".two" ).trigger( "click" );
+							$('.content').removeClass('hidden');
+							$('.content-body').html("<div class='like-color'><ul class='imageList'></ul></div>");
+
+							var cList = $('ul.imageList');
+
+							$.each(response.images, function(i) {
+								var li = $('<li/>')
+								    .addClass('ui-menu-item')
+								    .css({'background':'url('+response.images[i]+')'})
+								    .appendTo(cList);
+							});
+
+							$(".imageList > li:gt(0)").hide();
+
+
+
+							imageScraper = setInterval(function(){flicker()}, 100);
+
+							function flicker() {
+								$('.imageList > li:first')
+								  .fadeOut(10)
+								  .next()
+								  .fadeIn(10)
+								  .end()
+								  .appendTo('.imageList');
 							}
-						}, 6000);
 
+							setTimeout(function() {
+								myStopFunction();
+								returnToOrigin();
+								if (  imageScraper <= 125  ){
+									happy(1);
+								} else {
+									//nope();
+									$(".halo")		
+									.velocity({ marginLeft: '-=200'}, { duration: 200, easing: "easeOutCirc"})
+									.velocity({ marginLeft: '+=400'}, { duration: 200, easing: "easeOutCirc"})
+									.velocity({ marginLeft: '-=200'}, { duration: 300, easing: "easeOutCirc"});
+								}
+							}, 6000);
+						});
 
-
-
-
+					}
 						// $('.content-body').html("<div class='big'><ul class='imageList'></ul></div>");
 
 						// var cList = $('ul.imageList');
@@ -126,7 +142,6 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 						//         .appendTo(li);
 						//   });
 
-					});
 
 					break;
 
@@ -138,6 +153,38 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 				case "close":
 					myStopFunction();
 					returnToOrigin();
+					break;
+
+				//---------------------------------------------------------------------------------------
+				//  Do you like
+				//---------------------------------------------------------------------------------------
+
+
+				case "How_are_you_":
+
+					$( ".two" ).trigger( "click" );
+					$('.content').removeClass('hidden');
+			
+					socket.get("/display/news", function (response) {
+						$('.content-body').html("<div class='big'>"+response.sentiment+"</div>");
+					});
+					break;
+
+
+
+				//---------------------------------------------------------------------------------------
+				//  Where am I
+				//---------------------------------------------------------------------------------------
+
+
+				case "location":
+
+					$( ".two" ).trigger( "click" );
+					$('.content').removeClass('hidden');
+					socket.get("/display/wolfram?sentence=earth distance from sun", function (response) {
+						$('.content-body').html("<div class='big'>"+response.output+"</div>");
+					});
+
 					break;
 
 				//---------------------------------------------------------------------------------------
