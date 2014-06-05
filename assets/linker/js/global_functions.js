@@ -40,7 +40,7 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 
 				case "do_you_like":
 
-					if (body.message_body.body == "humans" ) {
+					if (body.message_body.body == "humans" || body.message_body.body == "human" ) {
 
 						socket.get('/mood/ratio', function (data) {
 						    console.log(data.percentage);

@@ -35,7 +35,7 @@ module.exports = {
 			'you': 10,
 			'love': 10,
 			'how are you': 15,
-			'please': 5,
+			'please': 15,
 			'thank you': 25,
 			'entity': 5,
 			'thanks': 25,
@@ -133,9 +133,10 @@ module.exports = {
 					      }
 
 					      for (var images in objs) {
-					         //console.log(objs[images].images[0].colors[0].color);
+					         console.log(objs[images].images[0]);
 					         if ( objs[images].images[0] !== undefined ){
 					        	 colors.push(objs[images].images[0].colors[0].color);
+					        	 //console.log(objs[images].images[0].colors[0].color);
 					     	}
 					      }
 
