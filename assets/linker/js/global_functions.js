@@ -150,6 +150,23 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 				//---------------------------------------------------------------------------------------
 
 
+				case "showme":
+
+					$( ".two" ).trigger( "click" );
+					
+					socket.get("/display/showImage?sentence="+body.objects_to_show.body, function (response) {
+						console.log(response.images[0]);
+						$('.content-body').html("<div class='big'><div class='crop'><img src="+response.images[0]+"></div></div>");
+						$('.content').removeClass('hidden');
+					});
+
+					break;
+
+				//---------------------------------------------------------------------------------------
+				//  Go back to start position / abort
+				//---------------------------------------------------------------------------------------
+
+
 				case "close":
 					myStopFunction();
 					returnToOrigin();
@@ -163,11 +180,13 @@ function reaction (intent,confidence,sentiment,comparative,body) {
 				case "How_are_you_":
 
 					$( ".two" ).trigger( "click" );
-					$('.content').removeClass('hidden');
-			
-					socket.get("/display/news", function (response) {
-						$('.content-body').html("<div class='big'>"+response.sentiment+"</div>");
-					});
+					$('.content').addClass('hidden');
+					setTimeout(function() {
+						socket.get("/display/news", function (response) {
+							$('.content-body').html("<div class='big'>"+response.sentiment+"</div>");
+							$('.content').removeClass('hidden');
+						});
+					}, 1000);
 					break;
 
 

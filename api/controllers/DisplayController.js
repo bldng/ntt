@@ -44,7 +44,7 @@ module.exports = {
 			'stupid': -10,
 			's': -10,
 			'c': -20,
-			'a': -15,
+			//'a': -15,
 			'd': -15,
 			'sorry': 25,
 			'i like you': 25,
@@ -174,6 +174,65 @@ module.exports = {
 		
 
 	},
+
+	//---------------------------------------------------------------------------------------
+	//	show single image
+	//---------------------------------------------------------------------------------------
+
+	showImage: function(req,res) {
+
+		var https = require('https');
+		var qs = require('querystring');
+		var request = require('request');
+
+		var s = req.query.sentence;
+
+		var result = {success:false};
+		//console.log("Bing Search for "+s);
+		var options = {
+			hostname:"api.datamarket.azure.com",
+			path:"/Bing/Search/Image?ImageFilters=%27Size%3AMedium%27&Query=%27" + qs.escape(s) + "%27&Adult=%27strict%27&$top=1&$format=json",
+			method:"GET",
+			auth:":LajDpVk8HkYOqRSOzr/B1eVrHNEndCSZRAYBHpJbbI8",
+			rejectUnauthorized:false
+		}
+
+
+		https.get(options, function(response) {
+			console.log("Got response: " +response.statusCode);
+			var body = "";
+
+			response.on('data', function (chunk) {
+				body += chunk;
+			});
+
+			response.on('end', function() {
+				result.success = true;
+				var data = JSON.parse(body);
+				result.data = data.d.results;
+
+				var imageURLs = [];
+
+				for (var __metadata in result.data) {
+				   imageURLs.push(result.data[__metadata].MediaUrl);
+				}
+
+				return res.send({
+					images: imageURLs
+				})
+			});
+
+
+
+		}).on('error', function(e) {
+			console.log("Got error: " + e.message);
+			//cb(result);
+		});
+
+		
+
+	},
+
 	wolfram: function(req, res) {
 
 		var Client = require('node-wolfram');
@@ -218,7 +277,7 @@ module.exports = {
 		    'stupid': -10,
 		    's': -10,
 		    'c': -20,
-		    'a': -15,
+		    //'a': -15,
 		    'd': -15,
 		    'sorry': 25,
 		    'i like you': 25,
@@ -279,7 +338,7 @@ module.exports = {
 
 		        //return res.send('file exists ...')
 		    } else {
-		    	var url = "http://content.guardianapis.com/search?section=world&page-size=50&order-by=relevance&show-fields=body&date-id=date%2Fyesterday&show-redistributable-only=body&api-key=mhe363khxt4dbm85vpewe2ev"
+		    	var url = "http://content.guardianapis.com/search?section=world&page-size=50&order-by=relevance&show-fields=body&date-id=date%2Ftoday&show-redistributable-only=body&api-key=mhe363khxt4dbm85vpewe2ev"
 		    	http.get(url, function(response) {
 		    	    var body = '';
 		    	    var articles;
@@ -298,6 +357,7 @@ module.exports = {
 		    	        for (var i = articles - 1; i >= 0; i--) {
 
 		    	        	var sentence = responseFull.response.results[i].fields.body; // get text
+		    	        	//console.log(sentence);
 		    	        	var stripped = sentence.replace(/(<([^>]+)>)/g,""); // strip html
 
 		    	        	allArticles += stripped;
