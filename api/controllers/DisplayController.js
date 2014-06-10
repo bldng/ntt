@@ -134,7 +134,7 @@ module.exports = {
 
 					      for (var images in objs) {
 					         console.log(objs[images].images[0]);
-					         if ( objs[images].images[0] !== undefined ){
+					         if ( objs[images].images[0].colors !== undefined ){
 					        	 colors.push(objs[images].images[0].colors[0].color);
 					        	 //console.log(objs[images].images[0].colors[0].color);
 					     	}
