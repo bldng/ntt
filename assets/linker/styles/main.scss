@@ -219,6 +219,7 @@ container{
 
 .halo{
   //transition: .4s all;
+  -webkit-will-change: animation, width, height;
   -webkit-transform-style: preserve-3d;
     &.input{
     width:100px;
