@@ -1,6 +1,6 @@
 # ntt
 
-part of my bachelor thesis which is documented here: [gerhardbliedung.com/ntt](http://www.gerhardbliedung.com)
+part of my bachelor thesis which is documented here: [gerhardbliedung.com?page=ntt](http://www.gerhardbliedung.com/?page=ntt)
 
 
 to run:
